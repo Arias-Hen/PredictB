@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PredictBuild</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+{% extends 'base.html' %}
+{% block content %}
+
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <form method="POST" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-12">
+                        <label for="nombre_completo" class="form-label">Nombre Completo *</label>
+                        <input type="text" class="form-control" id="nombre_completo" name="nombre_completo"
+                            placeholder="Escribe tu nombre completo">
+                    </div>
+                    <div class="col-12">
+                        <label for="correo_electronico" class="form-label">Correo Electrónico *</label>
+                        <input type="email" class="form-control" id="correo_electronico" name="correo_electronico"
+                            placeholder="Escribe tu correo electrónico">
+                    </div>
+                    <div class="col-12">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="telefono" name="telefono"
+                            placeholder="Escribe tu número de teléfono">
+                    </div>
+                    <div class="col-12">
+                        <label for="nombre_empresa" class="form-label">Nombre de la Empresa *</label>
+                        <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa"
+                            placeholder="Escribe el nombre de tu empresa">
+                    </div>
+                    <div class="col-12">
+                        <label for="cargo_rol" class="form-label">Cargo o Rol</label>
+                        <input type="text" class="form-control" id="cargo_rol" name="cargo_rol"
+                            placeholder="Escribe tu cargo o rol">
+                    </div>
+                    <div class="col-12">
+                        <label for="motivo_consulta" class="form-label">Motivo de Consulta</label>
+                        <select class="form-select" id="motivo_consulta" name="motivo_consulta">
+                            <option value="" selected>Selecciona un motivo</option>
+                            <option value="1">Información general</option>
+                            <option value="2">Soporte técnico</option>
+                            <option value="3">Consultoría</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms">
+                            <label class="form-check-label" for="terms">
+                                Acepto los <a href="/home/terminos">términos y condiciones</a>
+                                establecidos en el Aviso Legal y Política de Privacidad *
+                            </label>
+
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary w-100">Solicitar Demostración Gratuita</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function showModal(message) {
+            document.getElementById('modalMessage').innerText = message;
+            var myModal = new bootstrap.Modal(document.getElementById('responseModal'), {
+                keyboard: false
+            });
+            myModal.show();
+        }
+
+        const form = document.querySelector('form');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showModal(data.message);
+                })
+                .catch(error => {
+                    showModal("Hubo un error al enviar el formulario. Por favor, inténtalo de nuevo.");
+                });
+        });
+    </script>
+
+</body>
+<style>
+    .form-check-input {
+        width: 30px;
+    }
+
+    body {
+        background-color: #f0f0f0;
+    }
+
+    .form-container {
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        height: 80vh;
+        margin-top: 50px;
+    }
+
+    .form-container form {
+        width: 20%;
+    }
+
+    .rectangle-container {
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        height: 50px;
+        font-size: 1.2rem;
+        border: 4px solid black;
+        border-radius: 0;
+        text-align: center;
+    }
+
+    .form-check-input {
+        height: 20px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        font-size: 1rem;
+        background-color: white;
+        color: blue;
+    }
+
+    .tick {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+</style>
+
+</html>
+{% endblock %}

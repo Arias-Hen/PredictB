@@ -1,0 +1,96 @@
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4" href="\home">PREDICTBUILD</a>
+            <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto custom-nav-items">
+                    <li class="nav-item">
+                        <a class="nav-link active position-relative fw-medium" href="\home">INICIO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative fw-medium" href="\home\cfunciona">CÓMO FUNCIONA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative fw-medium" href="\home\casos">CASOS DE ÉXITO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative fw-medium" href="\home\contacto">CONTACTO</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item me-3">
+                        <a class="nav-link d-flex align-items-center" href="#">
+                            <span class="bi bi-globe me-1"></span>ES
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-dark px-4 shadow-sm" onclick="window.location.href='/home/login'">INICIAR SESIÓN</button>
+                            <button class="btn btn-outline-secondary px-4 shadow-sm" disabled>COMENZAR PRUEBA</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <style>
+        .navbar-brand {
+            color: blue !important;
+            letter-spacing: -0.5px;
+        }
+
+        .custom-navbar {
+            padding: 12px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-link {
+            color: #444 !important;
+            transition: all 0.2s ease;
+            padding: 8px 12px !important;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: rgba(0, 0, 255, 0.05);
+            color: blue !important;
+        }
+
+        .nav-link.active {
+            color: blue !important;
+            font-weight: 500 !important;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 12px;
+            right: 12px;
+            height: 2px;
+            background: blue;
+            border-radius: 2px;
+        }
+
+        .btn-dark {
+            background: blue !important;
+            border-color: blue !important;
+        }
+
+        .btn-dark:hover {
+            background: #0000cc !important;
+            border-color: #0000cc !important;
+        }
+
+        .btn-outline-secondary {
+            border-color: #ddd !important;
+            color: #666 !important;
+        }
+    </style>
+    {% block content %}
+    {% endblock %}
+</body>

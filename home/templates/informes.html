@@ -1,0 +1,797 @@
+{% extends 'sidebar.html' %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PredictBuild Dashboard</title>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    </noscript>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- Título (azul completo) -->
+        <div class="top-bar d-flex flex-column px-0">
+
+            <div class="row g-0 text-black filters-row align-items-center"
+                style="height: 70px; background-color: white;">
+                <div class="col-md-1 text-start ps-3"></div>
+                <div class="col-md-3">
+                    <h4 class="m-0">INFORMES</h4>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="{% static 'img/logo.jpeg' %}" alt="Logo" style="height: 110%; width: auto;">
+                </div>
+            </div>
+            <!-- Barra de búsqueda (azul completo) -->
+            <div class="row g-0">
+                <div class="col-12 bg-blue p-2">
+                    <div class="row ms-1">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" placeholder="BUSQUE POR DIRECCIÓN">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Filtros (azul completo) -->
+            <div class="row g-0 filter-section">
+                <div class="col-12 bg-blue p-2">
+                    <div class="row ms-1">
+                        <div class="col-md-1">
+                            <label>Desde:</label>
+                            <input type="date" class="form-control form-control-sm" id="desde">
+                        </div>
+                        <div class="col-md-1">
+                            <label>Hasta:</label>
+                            <input type="date" class="form-control form-control-sm"
+                                style="height: 31px; font-size: 0.9rem;" id="hasta">
+                        </div>
+
+                        <div class="col-md-1">
+                            <label>Ciudad:</label>
+                            <select id="ciudad_1" class="form-select" style="height: 31px; font-size: 0.9rem;"
+                                aria-label="Seleccionar ciudad" onchange="cargarDistritos('1')"></select>
+
+                        </div>
+                        <div class="col-md-1">
+                            <label>Distrito:</label>
+                            <select id="distrito_1" class="form-select" style="height: 31px; font-size: 0.9rem;"
+                                onchange="cargarBarrios('1')"></select>
+                        </div>
+                        <div class="col-md-1">
+                            <label>Barrio:</label>
+                            <select id="barrio_1" class="form-select" style="height: 31px; font-size: 0.9rem;"
+                                onchange="cargarCalle('1')"></select>
+                        </div>
+                        <div class="col-md-1">
+                            <label>Calle:</label>
+                            <select id="calle_1" class="form-select" style="height: 31px; font-size: 0.9rem;"></select>
+                        </div>
+                        <div class="col-md-1">
+                            <label>Tipo:</label>
+                            <select class="form-select form-select-sm">
+                                <option>Valoración</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label>Precio Desde:</label>
+                            <select class="form-select form-select-sm">
+                                <option>200.000</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label>Precio Hasta:</label>
+                            <select class="form-select form-select-sm">
+                                <option>3.000.000</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button class="btn btn-clear btn-sm w-100 mt-4">LIMPIAR FILTROS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-0">
+                <div class="col-lg-12 p-0 m-0">
+                    <!-- Tabla -->
+                    <div class="table-section p-0 m-0">
+                        <table id="valoraciones-table" class="table table-sm table-bordered w-100 m-0">
+                            <thead>
+                                <tr>
+                                    <th>Seleccionar</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Precio</th>
+                                    <th>Ubicación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for valoracion in valoraciones %}
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>{{ valoracion.fecha_guardado }}</td>
+                                    <td>{{ valoracion.modo }}</td>
+                                    <td></td>
+                                    <td>{{ valoracion.ciudad }}</td>
+                                    <!-- columnas ocultas -->
+                                    <td class="hidden-column">{{ valoracion.planta }}</td>
+                                    <td class="hidden-column">{{ valoracion.distrito }}</td>
+                                    <td class="hidden-column">{{ valoracion.barrio }}</td>
+                                    <td class="hidden-column">{{ valoracion.calle }}</td>
+                                    <td class="hidden-column">{{ valoracion.tipo_vivienda }}</td>
+                                    <td class="hidden-column">{{ valoracion.estado }}</td>
+                                    <td class="hidden-column">{{ valoracion.m2 }}</td>
+                                    <td class="hidden-column">{{ valoracion.num_habitaciones }}</td>
+                                    <td class="hidden-column">{{ valoracion.num_banos }}</td>
+                                    <td class="hidden-column">{{ valoracion.terraza }}</td>
+                                    <td class="hidden-column">{{ valoracion.balcon }}</td>
+                                    <td class="hidden-column">{{ valoracion.ascensor }}</td>
+                                    <td class="hidden-column">{{ valoracion.precio_minimo }}</td>
+                                    <td class="hidden-column">{{ valoracion.precio_esperado }}</td>
+                                    <td class="hidden-column">{{ valoracion.precio_maximo }}</td>
+                                    <td class="hidden-column">{{ valoracion.precio_esperado_unico }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-container" style="text-align: center; margin-top: 20px;">
+                        <button class="export-to-excel btn btn-success btn-primary" style="margin-bottom: 10px;">
+                            Exportar a Excel
+                        </button>
+                        <button class="open-record btn btn-info btn-primary"
+                            style="margin-bottom: 10px; margin-left: 10px;">Abrir</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+</body>
+<script>
+    document.getElementById('desde').addEventListener('change', filtrarTodo);
+    document.getElementById('hasta').addEventListener('change', filtrarTodo);
+    window.addEventListener('DOMContentLoaded', () => {
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0'); // Mes +1 porque es base 0
+        const dd = String(hoy.getDate()).padStart(2, '0');
+
+        const fechaHoy = `${yyyy}-${mm}-${dd}`;
+
+        const desdeInput = document.getElementById('desde');
+        const hastaInput = document.getElementById('hasta');
+
+        if (desdeInput && !desdeInput.value) desdeInput.value = fechaHoy;
+        if (hastaInput && !hastaInput.value) hastaInput.value = fechaHoy;
+    });
+
+    const optionsJson = '{{ options_json|escapejs }}';
+    const ciudadSe = JSON.parse('{{ context_json|escapejs }}');
+
+    if (optionsJson.trim() === "") {
+        console.error("La variable options_json está vacía.");
+    } else {
+        const selectCiudad = document.getElementById('ciudad');
+        cargarCiudades('1')
+        cargarCiudades('2')
+    }
+    function cargarCiudades(sufijo) {
+        if (optionsJson.trim() === "") {
+            console.error("La variable options_json está vacía.");
+            return;
+        }
+
+        const options = JSON.parse(optionsJson);
+
+        const selectCiudad = document.getElementById('ciudad_' + sufijo);
+
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.id;
+            optionElement.textContent = option.name;
+            selectCiudad.appendChild(optionElement);
+        });
+
+        const ciudad = ciudadSe.ciudad; // mismo comportamiento que antes
+        if (ciudad) {
+            const optionToSelect = Array.from(selectCiudad.options).find(option => option.value === ciudad);
+            if (optionToSelect) {
+                optionToSelect.selected = true;
+                selectCiudad.dispatchEvent(new Event('change'));
+            }
+        }
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+
+    }
+    function cargarDistritos(sufijo) {
+        const ciudadSelect = document.getElementById('ciudad_' + sufijo);
+        const distritoSelect = document.getElementById('distrito_' + sufijo);
+
+        const ciudadSeleccionada = ciudadSelect?.value;
+        if (!ciudadSeleccionada) {
+            if (distritoSelect) distritoSelect.innerHTML = '';
+            console.log("a");
+            return;
+        }
+
+        console.log(`URL de la solicitud: /home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`);
+
+        fetch(`/home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!distritoSelect) return;
+
+                distritoSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "Todos";
+                distritoSelect.appendChild(defaultOption);
+
+                data.distritos.forEach(distrito => {
+                    const option = document.createElement('option');
+                    option.value = distrito.id;
+                    option.textContent = distrito.name;
+                    distritoSelect.appendChild(option);
+                });
+
+                const distritoSe = JSON.parse('{{ context_json|escapejs }}');
+                const distrito = distritoSe.distrito;
+                console.log("distrito:", distrito);
+                if (distrito) {
+                    const seleccion = Array.from(distritoSelect.options).find(option => option.value === distrito);
+                    if (seleccion) {
+                        seleccion.selected = true;
+                        distritoSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar los distritos:', error));
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+    }
+    function cargarBarrios(sufijo) {
+        const distritoSelect = document.getElementById('distrito_' + sufijo);
+        const barrioSelect = document.getElementById('barrio_' + sufijo);
+
+        const distritoSeleccionado = distritoSelect?.value;
+
+        if (!distritoSeleccionado) {
+            console.log("No se seleccionó ningún distrito.");
+            if (barrioSelect) barrioSelect.innerHTML = '';
+            return;
+        }
+
+        console.log(`URL de la solicitud: /home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`);
+
+        fetch(`/home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos del servidor:', data);
+
+                if (!barrioSelect) return;
+                barrioSelect.innerHTML = '';
+
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "Todos";
+                barrioSelect.appendChild(defaultOption);
+
+                data.barrio.forEach(barrio => {
+                    const option = document.createElement('option');
+                    option.value = barrio.id;
+                    option.textContent = barrio.name;
+                    barrioSelect.appendChild(option);
+                });
+
+                const barrioSe = JSON.parse('{{ context_json|escapejs }}');
+                const barrio = barrioSe.barrio;
+                if (barrio) {
+                    const seleccion = Array.from(barrioSelect.options).find(option => option.value === barrio);
+                    if (seleccion) {
+                        seleccion.selected = true;
+                        barrioSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar los barrios:', error));
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+    }
+    function cargarCalle(sufijo) {
+        const barrioSelect = document.getElementById('barrio_' + sufijo);
+        const calleSelect = document.getElementById('calle_' + sufijo);
+
+        const barrioSeleccionado = barrioSelect?.value;
+
+        if (!barrioSeleccionado) {
+            console.log("No se seleccionó ningún barrio.");
+            if (calleSelect) calleSelect.innerHTML = '';
+            return;
+        }
+
+        console.log(`URL de la solicitud: /home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`);
+
+        fetch(`/home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos del servidor:', data);
+
+                if (!calleSelect) return;
+                calleSelect.innerHTML = '';
+
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "Todos";
+                calleSelect.appendChild(defaultOption);
+
+                data.calle.forEach(calle => {
+                    const option = document.createElement('option');
+                    option.value = calle.id;
+                    option.textContent = calle.name;
+                    calleSelect.appendChild(option);
+                });
+
+                const calleSe = JSON.parse('{{ context_json|escapejs }}');
+                const calle = calleSe.calle;
+                if (calle) {
+                    const seleccion = Array.from(calleSelect.options).find(option => option.value === calle);
+                    if (seleccion) {
+                        seleccion.selected = true;
+                        calleSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar las calles:', error));
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ciudadSe = JSON.parse('{{ context_json|escapejs }}');
+        console.log("JEISON", ciudadSe)
+        if (ciudadSe) {
+            document.getElementById('num-banos').value = ciudadSe.num_banos || '';
+            document.getElementById('num-habitaciones').value = ciudadSe.num_habitaciones || '';
+            document.getElementById('metros-cuadrados').value = ciudadSe.m2 || '';
+
+            const plantaSelect = document.getElementById('planta');
+            plantaSelect.value = ciudadSe.planta || '';
+
+            const ascensorSelect = document.getElementById('tiene-ascensor');
+            ascensor = ciudadSe.ascensor;
+            if (ascensor !== undefined && ascensor !== null) {
+                const seleccion = Array.from(ascensorSelect.options).find(option => option.value === String(ascensor));
+                if (seleccion) {
+                    seleccion.selected = true;
+                    ascensorSelect.dispatchEvent(new Event('change'));
+                }
+            }
+            const estadoSelect = document.getElementById('estado-inmueble');
+            estadoSelect.value = ciudadSe.estado || '';
+
+            const tipoSelect = document.getElementById('tipo-vivienda');
+            tipoSelect.value = ciudadSe.tipo_vivienda || '';
+
+            const terrazaSelect = document.getElementById('tiene-terraza');
+            terrazaSelect.value = ciudadSe.terraza || '';
+
+            const balconSelect = document.getElementById('tiene-balcon');
+            balconSelect.value = ciudadSe.balcon || '';
+
+
+            const precio_min = document.getElementById('precio-minimo');
+            precio_min.textContent = ciudadSe.precio_minimo || '';
+
+            const precio_max = document.getElementById('precio-maximo');
+            precio_max.textContent = ciudadSe.precio_maximo || '';
+
+            const precio_esp = document.getElementById('precio-esperado');
+            precio_esp.textContent = ciudadSe.precio_esperado || '';
+
+            const precio_esu = document.getElementById('precio-esperado-unico');
+            precio_esu.textContent = ciudadSe.precio_esperado_unico || '';
+
+        }
+    });
+
+
+    document.body.addEventListener('click', function (event) {
+        if (event.target && event.target.matches('.export-to-excel')) {
+            excelAbrir();
+        }
+        if (event.target && event.target.matches('.open-record')) {
+            excelAbrir();
+        }
+    });
+    function excelAbrir() {
+        if (event.target && event.target.classList.contains('export-to-excel')) {
+            const viviendaMap = {
+                0: "Estudio",
+                1: "Piso",
+                2: "Chalet adosado",
+                3: "Dúplex",
+                4: "Ático",
+                5: "Chalet pareado",
+                6: "Casa o chalet"
+            };
+            const plantaMap = {
+                0: "Sótano",
+                1: "Semi-Sótano",
+                2: "Entreplanta",
+                3: "Bajo",
+                4: "1",
+                5: "2",
+                6: "3",
+                7: "4",
+                8: "5",
+                9: "6",
+                10: "7",
+                11: "8"
+            };
+            const ascensorMap = {
+                'false': "No",
+                'true': "Sí"
+            };
+            const estadoInmuebleMap = {
+                0: "Obra nueva",
+                1: "Segunda Mano/buen estado",
+                2: "Segunda Mano/para reformar",
+                3: "No declara"
+            };
+            const terrazaBalconMap = {
+                'false': "No",
+                'true': "Sí"
+            };
+            const selectedRows = [];
+
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox && checkbox.checked) {
+                    const rowData = {
+                        fecha_guardado: row.querySelector('td:nth-child(2)').textContent.trim(),
+                        modo: row.querySelector('td:nth-child(4)').textContent.trim(),
+                        ciudad: row.querySelector('td:nth-child(5)').textContent.trim(),
+                        distrito: row.querySelector('td:nth-child(6)').textContent.trim(),
+                        barrio: row.querySelector('td:nth-child(7)').textContent.trim(),
+                        calle: row.querySelector('td:nth-child(8)').textContent.trim(),
+                        planta: row.querySelector('td:nth-child(10)').textContent.trim(),
+                        tipo_vivienda: row.querySelector('td:nth-child(11)').textContent.trim(),
+                        estado_inmueble: row.querySelector('td:nth-child(12)').textContent.trim(),
+                        metros_cuadrados: row.querySelector('td:nth-child(13)').textContent.trim(),
+                        num_habitaciones: row.querySelector('td:nth-child(14)').textContent.trim(),
+                        num_banos: row.querySelector('td:nth-child(15)').textContent.trim(),
+                        terraza: row.querySelector('td:nth-child(16)').textContent.trim() === 'True' ? 'SI' : 'NO',
+                        balcon: row.querySelector('td:nth-child(17)').textContent.trim() === 'True' ? 'SI' : 'NO',
+                        ascensor: row.querySelector('td:nth-child(18)').textContent.trim() === 'True' ? 'SI' : 'NO',
+                        precio_minimo: row.querySelector('td:nth-child(19)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(18)').textContent.trim(),
+                        precio_esperado: row.querySelector('td:nth-child(20)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(19)').textContent.trim(),
+                        precio_maximo: row.querySelector('td:nth-child(21)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(20)').textContent.trim(),
+                        precio_esperado_unico: row.querySelector('td:nth-child(22)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(21)').textContent.trim(),
+                    };
+                    selectedRows.push(rowData);
+                    console.log("DATOS DEL EXCEL", rowData)
+                }
+            });
+
+            if (selectedRows.length === 0) {
+                alert('Por favor, seleccione al menos una fila para exportar.');
+                return;
+            }
+
+            fetch('/home/exportar_excel/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken(),
+                },
+                body: JSON.stringify({ seleccionados: selectedRows }),
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'valoraciones_seleccionadas.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .catch(error => console.error('Error al exportar el archivo:', error));
+        }
+
+        if (event.target && event.target.classList.contains('open-record')) {
+            const selectedRows = [];
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox && checkbox.checked) {
+                    const rowData = {
+                        fecha_guardado: row.querySelector('td:nth-child(2)').textContent.trim(),
+                        modo: row.querySelector('td:nth-child(4)').textContent.trim(),
+                        ciudad: row.querySelector('td:nth-child(5)').textContent.trim(),
+                        distrito: row.querySelector('td:nth-child(6)').textContent.trim(),
+                        barrio: row.querySelector('td:nth-child(7)').textContent.trim(),
+                        calle: row.querySelector('td:nth-child(8)').textContent.trim(),
+                        planta: row.querySelector('td:nth-child(10)').textContent.trim(),
+                        tipo_vivienda: row.querySelector('td:nth-child(11)').textContent.trim(),
+                        estado_inmueble: row.querySelector('td:nth-child(12)').textContent.trim(),
+                        metros_cuadrados: row.querySelector('td:nth-child(13)').textContent.trim(),
+                        num_habitaciones: row.querySelector('td:nth-child(14)').textContent.trim(),
+                        num_banos: row.querySelector('td:nth-child(15)').textContent.trim(),
+                        terraza: row.querySelector('td:nth-child(16)').textContent.trim() === 'True' ? 'SI' : 'NO',
+                        balcon: row.querySelector('td:nth-child(17)').textContent.trim() === 'True' ? 'SI' : 'NO',
+                        ascensor: row.querySelector('td:nth-child(18)').textContent.trim() === 'True' ? 'SI' : 'NO',
+                        precio_minimo: row.querySelector('td:nth-child(19)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(18)').textContent.trim(),
+                        precio_esperado: row.querySelector('td:nth-child(20)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(19)').textContent.trim(),
+                        precio_maximo: row.querySelector('td:nth-child(21)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(20)').textContent.trim(),
+                        precio_esperado_unico: row.querySelector('td:nth-child(22)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(21)').textContent.trim(),
+                    };
+                    selectedRows.push(rowData);
+                    console.log("DATOS SELECCIONADOS ", selectedRows)
+                }
+            });
+
+            if (selectedRows.length === 0) {
+                return;
+            }
+
+            const selectedRecord = selectedRows[0];
+            if (selectedRows.length > 0) {
+                const selectedRecord = selectedRows[0];
+
+                document.getElementById('ciudad_2').value = selectedRecord.ciudad;
+                cargarDistritos('2');
+
+                setTimeout(() => {
+                    document.getElementById('distrito_2').value = selectedRecord.distrito;
+                    cargarBarrios('2');
+
+                    setTimeout(() => {
+                        document.getElementById('barrio_2').value = selectedRecord.barrio;
+                        cargarCalle('2');
+
+                        setTimeout(() => {
+                            document.getElementById('calle_2').value = selectedRecord.calle;
+                        }, 300);
+                    }, 300);
+                }, 300);
+
+
+                document.getElementById('tipo-vivienda').value = selectedRecord.tipo_vivienda;
+                document.getElementById('num-banos').value = selectedRecord.num_banos;
+                document.getElementById('num-habitaciones').value = selectedRecord.num_habitaciones;
+                document.getElementById('metros-cuadrados').value = selectedRecord.metros_cuadrados;
+                document.getElementById('planta').value = selectedRecord.planta;
+                document.getElementById('tiene-ascensor').value = selectedRecord.ascensor === 'SI' ? '1' : '0';
+                document.getElementById('estado-inmueble').value = selectedRecord.estado_inmueble;
+
+
+                document.getElementById('tiene-terraza').value = selectedRecord.terraza === 'SI' ? '1' : '0';
+                document.getElementById('tiene-balcon').value = selectedRecord.balcon === 'SI' ? '1' : '0';
+            }
+            const mainContent = document.getElementById('main-content');
+
+            document.body.addEventListener('click', function (event) {
+                if (event.target && event.target.matches('.filter-button')) {
+                    filtrar();
+                }
+            });
+        }
+    };
+
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+
+    function filtrarTodo() {
+        console.log("filtrarTodo ejecutado");
+
+        const desdeInput = document.getElementById('desde');
+        const hastaInput = document.getElementById('hasta');
+
+        let desdeStr = '';
+        let hastaStr = '';
+
+        if (desdeInput && desdeInput.value) {
+            desdeStr = desdeInput.value;
+        }
+
+        if (hastaInput && hastaInput.value) {
+            hastaStr = hastaInput.value;
+        }
+
+        let ciudad = document.getElementById('ciudad_1')?.value.toLowerCase() || '';
+        let distrito = document.getElementById('distrito_1')?.value.toLowerCase() || '';
+        let barrio = document.getElementById('barrio_1')?.value.toLowerCase() || '';
+        let calle = document.getElementById('calle_1')?.value.toLowerCase() || '';
+
+        if (distrito === 'todos' || distrito === 'seleccionar') distrito = '';
+        if (barrio === 'todos' || barrio === 'seleccionar') barrio = '';
+        if (calle === 'todos' || calle === 'seleccionar') calle = '';
+
+        const tabla = document.getElementById('valoraciones-table');
+        const filas = tabla.tBodies[0].rows;
+
+        for (let fila of filas) {
+            let mostrar = true;
+
+            const textoFecha = fila.cells[1].textContent.trim(); // dd/mm/yyyy
+            const partes = textoFecha.split('/');
+            let fechaFilaStr = '';
+
+            if (partes.length === 3) {
+                const dia = partes[0].padStart(2, '0');
+                const mes = partes[1].padStart(2, '0');
+                const anio = partes[2];
+                fechaFilaStr = `${anio}-${mes}-${dia}`; // yyyy-mm-dd
+            }
+
+            if (desdeStr && fechaFilaStr < desdeStr) mostrar = false;
+            if (hastaStr && fechaFilaStr > hastaStr) mostrar = false;
+
+            if (ciudad && !fila.cells[4].textContent.toLowerCase().includes(ciudad)) mostrar = false;
+            if (distrito && !fila.cells[5].textContent.toLowerCase().includes(distrito)) mostrar = false;
+            if (barrio && !fila.cells[6].textContent.toLowerCase().includes(barrio)) mostrar = false;
+            if (calle && !fila.cells[7].textContent.toLowerCase().includes(calle)) mostrar = false;
+
+            fila.style.display = mostrar ? '' : 'none';
+        }
+    }
+
+
+
+
+
+    document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
+        elem.addEventListener('change', filtrarTodo);
+    });
+
+
+    document.getElementById('ciudad_1').addEventListener('change', () => {
+        document.getElementById('distrito_1').innerHTML = '<option value="">-- Seleccionar distrito --</option>';
+        document.getElementById('barrio_1').innerHTML = '<option value="">-- Seleccionar barrio --</option>';
+        document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
+        filtrarTodo();
+    });
+    document.getElementById('distrito_1').addEventListener('change', () => {
+        document.getElementById('barrio_1').innerHTML = '<option value="">-- Seleccionar barrio --</option>';
+        document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
+        filtrarTodo();
+    });
+    document.getElementById('barrio_1').addEventListener('change', () => {
+        document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
+        filtrarTodo();
+    });
+
+    document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
+        elem.addEventListener('change', filtrarTodo);
+    });
+    document.getElementById('desde').addEventListener('change', filtrarTodo);
+    document.getElementById('hasta').addEventListener('change', filtrarTodo);
+
+
+
+
+</script>
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .container-fluid {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100%;
+    }
+
+    .col-lg-5 {
+        border-top: 2px solid black;
+        border-right: 2px solid black;
+    }
+
+
+    .bg-blue {
+        background-color: #001ba3 !important;
+    }
+
+    .bg-light-blue {
+        background-color: #ADD8E6 !important;
+    }
+
+    .btn-clear {
+        background-color: #00e1a1;
+        color: white;
+    }
+
+    .form-section {
+        background-color: white;
+        padding: 20px;
+    }
+
+    .table-section {
+        background-color: white;
+        padding: 20px;
+    }
+
+    .header-white {
+        background-color: white;
+        height: 70px;
+    }
+
+    .filter-section {
+        background-color: #001ba3;
+        color: white;
+        padding: 10px 0;
+    }
+
+    #valoraciones-table th {
+        padding-top: 0.68rem;
+        padding-bottom: 0.68rem;
+        background-color: #001ba3;
+        color: white;
+    }
+
+    #valoraciones-table td {
+        padding-top: 0.68rem;
+        padding-bottom: 0.68rem;
+        background-color: white;
+        color: black;
+    }
+
+
+    button,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    .btn {
+        background-color: #0001a0 !important;
+        color: white !important;
+        border-color: #0001a0 !important;
+    }
+
+    button:hover,
+    input[type="button"]:hover,
+    input[type="submit"]:hover,
+    input[type="reset"]:hover,
+    .btn:hover {
+        background-color: #0000c0 !important;
+        border-color: #0000c0 !important;
+    }
+
+    .table-bordered {
+        border: 2px solid #000000;
+    }
+
+    .hidden-column {
+        display: none;
+    }
+
+    .btn-outline-primary {
+        color: #001ba3;
+        border-color: #001ba3;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #001ba3;
+        color: white;
+    }
+</style>
+
+</html>
+{% endblock %}

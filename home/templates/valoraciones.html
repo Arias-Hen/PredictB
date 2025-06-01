@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PredictBuild Dashboard</title>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    </noscript>
+    {% extends 'sidebar.html' %}
+    {% block content %}
+    <div class="welcome-banner shadow-sm py-3 mb-4 fixed-top bg-white" style="margin-left: 250px; z-index: 1000;">
+        <h1 class="text-primary text-center fw-bold text-decoration-underline mb-0">BIENVENIDO A PROJECTBUILD</h1>
+    </div>
+</head>
+
+<body class="bg">
+    <div class="container-fluid">
+        <div class="row g-3 justify-content-center">
+            <div class="col-12 col-xl-10">
+                <div class="row mt-5">
+                    <!-- Formulario de Valoración -->
+                    <div class="col-12 col-lg-7 form-container ms-2">
+                        <h4
+                            class="text-center text-center text-primary text-center fw-bold text-decoration-underline mb-0">
+                            VALORACIÓN</h4>
+                        <form id="valuation-form">
+                            {% csrf_token %}
+                            <div class="row g-3 align-items-start"">
+                                <div class=" row g-3">
+                                <!-- Primera columna -->
+                                <div class="col-12 col-lg-4 col-md-6">
+                                    <label for="ciudad" class="form-label">Ciudad:</label>
+                                    <select id="ciudad" class="form-select" aria-label="Seleccionar ciudad"
+                                        onchange="cargarDistritos()"></select>
+                                    <label for="distrito" class="form-label">Distrito:</label>
+                                    <select id="distrito" class="form-select" aria-label="Seleccionar distrito"
+                                        onchange="cargarBarrios()"></select>
+                                    <label for="barrio" class="form-label">Barrio:</label>
+                                    <select id="barrio" class="form-select" aria-label="Seleccionar barrio"
+                                        onchange="cargarCalle()"></select>
+                                    <label for="calle" class="form-label">Calle:</label>
+                                    <select id="calle" class="form-select" aria-label="Seleccionar calle"></select>
+                                    <label for="tipo-vivienda" class="form-label mt-3">Tipo de vivienda:</label>
+                                    <select id="tipo-vivienda" class="form-select"
+                                        aria-label="Seleccionar tipo de vivienda">
+                                        <option value="0">Estudio</option>
+                                        <option value="1">Piso</option>
+                                        <option value="2">Chalet adosado</option>
+                                        <option value="3">Dúplex</option>
+                                        <option value="4">Ático</option>
+                                        <option value="5">Chalet pareado</option>
+                                        <option value="6">Casa o chalet</option>
+                                    </select>
+                                </div>
+                                <!-- Segunda columna -->
+                                <div class="col-12 col-lg-4 col-md-6">
+                                    <label for="num-banos" class="form-label">Número de baños:</label>
+                                    <input id="num-banos" class="form-control" type="number" min="1" step="1"
+                                        placeholder="" aria-label="Número de baños">
+                                    <label for="num-habitaciones" class="form-label">Número de
+                                        habitaciones:</label>
+                                    <input id="num-habitaciones" class="form-control" type="number" min="1" step="1"
+                                        placeholder="" aria-label="Número de habitaciones">
+                                    <label for="metros-cuadrados" class="form-label">Metros Cuadrados:</label>
+                                    <input id="metros-cuadrados" class="form-control" type="number" min="1" step="1"
+                                        placeholder="" aria-label="Metros cuadrados">
+                                    <label for="planta" class="form-label">Planta:</label>
+                                    <select id="planta" class="form-select" aria-label="Seleccionar planta">
+                                        <option value="-3">Sótano</option>
+                                        <option value="-2">Semi-Sótano</option>
+                                        <option value="-1">Entreplanta</option>
+                                        <option value="0">Bajo</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                    <label for="tiene-ascensor" class="form-label mt-3">Tiene ascensor:</label>
+                                    <select id="tiene-ascensor" class="form-select" aria-label="Seleccionar ascensor">
+                                        <option value="0">No</option>
+                                        <option value="1">Sí</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-lg-4 col-md-6">
+                                    <label for="estado-inmueble" class="form-label">Estado del
+                                        inmueble:</label>
+                                    <select id="estado-inmueble" class="form-select">
+                                        <option value="0">Obra nueva</option>
+                                        <option value="1">Segunda Mano/buen estado</option>
+                                        <option value="2">Segunda Mano/para reformar</option>
+                                        <option value="3">No declara</option>
+                                    </select>
+                                    <label for="tiene-terraza" class="form-label">Tiene terraza:</label>
+                                    <select id="tiene-terraza" class="form-select">
+                                        <option value="0">No</option>
+                                        <option value="1">Sí</option>
+                                    </select>
+                                    <label for="tiene-balcon" class="form-label">Tiene balcón:</label>
+                                    <select id="tiene-balcon" class="form-select">
+                                        <option value="0">No</option>
+                                        <option value="1">Sí</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Botones y tablas -->
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <button type="button" class="btn btn-primary" id="valorar">Valorar</button>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <table class="table table-bordered border-dark mb-0 bg-light">
+                                            <thead>
+                                                <tr>
+                                                    <th>Precio mínimo</th>
+                                                    <th>Precio esperado</th>
+                                                    <th>Precio máximo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td id="precio-minimo">0</td>
+                                                    <td id="precio-esperado">0</td>
+                                                    <td id="precio-maximo">0</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <button type="button" class="btn btn-primary mb-3 mt-3" id="tranformar"
+                                            onclick="transformarAProyecto()">TRANSFORMAR A
+                                            PROSPECTO DE VENTA
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <button type="button" class="btn btn-secondary" id="correccion"
+                                            onclick="correccionManual()">Correccion
+                                            Manual</button>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <table class="table table-bordered border-dark mb-0 bg-light">
+                                            <thead>
+                                                <tr>
+                                                    <th>Precio esperado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td id="precio-esperado-unico" contenteditable="true">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="d-flex justify-content-center gap-3 mt-4">
+                                        <button type="button" class="btn btn-primary" id="vvalorar">VOLVER A
+                                            VALORAR</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Visualización -->
+                <div class="col-12 col-lg-4">
+                    <h4 class="col-12 col-lg-12">Visualización</h4>
+                    <div class="row g-3">
+                        <!-- Cada gráfico en contenedor controlado -->
+                        <div class="col-12 col-sm-12 mb-4">
+                            <div class="chart-box bg-white p-2 rounded shadow-sm">
+                                <canvas id="radar-chart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+    const optionsJson = '{{ options_json|escapejs }}';
+    console.log("Datos JSON recibidos desde Django:", optionsJson);
+
+    if (optionsJson.trim() === "") {
+        console.error("La variable options_json está vacía.");
+    } else {
+        const options = JSON.parse(optionsJson);
+        console.log("Opciones cargadas desde el CSV:", options);
+
+        const selectCiudad = document.getElementById('ciudad');
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.id;
+            optionElement.textContent = option.name;
+            selectCiudad.appendChild(optionElement);
+        });
+    }
+
+    function cargarDistritos() {
+        const ciudadSeleccionada = document.getElementById('ciudad').value;
+
+        if (!ciudadSeleccionada) {
+            document.getElementById('distrito').innerHTML = '';
+            console.log("a")
+
+            return;
+
+        }
+        console.log(`URL de la solicitud: /home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`);
+        fetch(`/home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`)
+            .then(response => response.json())
+            .then(data => {
+                const distritoSelect = document.getElementById('distrito');
+                distritoSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "Seleccione un distrito";
+                distritoSelect.appendChild(defaultOption);
+
+                data.distritos.forEach(distrito => {
+                    const option = document.createElement('option');
+                    option.value = distrito.id;
+                    option.textContent = distrito.name;
+                    distritoSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error al cargar los distritos:', error));
+    }
+    function correccionManual() {
+        const nuevoPrecioEsperado = document.getElementById('precio-esperado-unico').innerText;
+        const precioEsperadoCelda = document.getElementById('precio-esperado');
+        precioEsperadoCelda.innerText = nuevoPrecioEsperado;
+    }
+    function cargarBarrios() {
+        const distritoSeleccionado = document.getElementById('distrito').value;
+
+        if (!distritoSeleccionado) {
+            console.log("No se seleccionó ningún distrito.");
+            document.getElementById('barrio').innerHTML = '';
+            return;
+
+        }
+        console.log(`URL de la solicitud: /home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`);
+
+        fetch(`/home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos del servidor:', data);
+
+                const barrioSelect = document.getElementById('barrio');
+                barrioSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "Seleccione un distrito";
+                barrioSelect.appendChild(defaultOption);
+
+                data.barrio.forEach(barrio => {
+                    const option = document.createElement('option');
+                    option.value = barrio.id;
+                    option.textContent = barrio.name;
+                    barrioSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error al cargar los barrios:', error));
+    }
+
+    function cargarCalle() {
+        const barrioSeleccionado = document.getElementById('barrio').value;
+
+        if (!barrioSeleccionado) {
+            console.log("No se seleccionó ningún distrito.");
+            document.getElementById('calle').innerHTML = '';
+            return;
+
+        }
+        console.log(`URL de la solicitud: /home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`);
+
+        fetch(`/home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos del servidor:', data);
+
+                const calleSelect = document.getElementById('calle');
+                calleSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "Seleccione una calle";
+                calleSelect.appendChild(defaultOption);
+
+                data.calle.forEach(calle => {
+                    const option = document.createElement('option');
+                    option.value = calle.id;
+                    option.textContent = calle.name;
+                    calleSelect.appendChild(option);
+                });
+                const barrioSe = JSON.parse('{{ context_json|escapejs }}');
+                const calle = ciudadSe.calle;
+                if (calle) {
+                    const seleccion = Array.from(calleSelect.options).find(option => option.value === calle);
+                    if (seleccion) {
+                        seleccion.selected = true;
+                        calleSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar los barrios:', error));
+    }
+    function transformarAProyecto() {
+        const iduser = "{{user_id}}";
+        const modo = "prospecto";
+        const ciudad = document.getElementById('ciudad').value;
+        const distrito = document.getElementById('distrito').value;
+        const barrio = document.getElementById('barrio').value;
+        const calle = document.getElementById('calle').value;
+        const tipo_vivienda = parseInt(document.getElementById('tipo-vivienda').value, 10);
+        const m2 = parseInt(document.getElementById('metros-cuadrados').value, 10);
+        const num_habitaciones = parseInt(document.getElementById('num-habitaciones').value, 10);
+        const num_banos = parseInt(document.getElementById('num-banos').value, 10);
+        const planta = document.getElementById('planta').value;
+        const terraza = document.getElementById('tiene-terraza').value;
+        const balcon = document.getElementById('tiene-balcon').value;
+        const ascensor = document.getElementById('tiene-ascensor').value;
+        const estado = document.getElementById('estado-inmueble').value;
+        const precio_minimo = document.getElementById('precio-minimo').textContent.replace(/[^0-9.-]+/g, "");
+        const precio_esperado = document.getElementById('precio-esperado').textContent.replace(/[^0-9.-]+/g, "");
+        const precio_maximo = document.getElementById('precio-maximo').textContent.replace(/[^0-9.-]+/g, "");
+        const precio_esperado_unico = document.getElementById('precio-esperado-unico') ? document.getElementById('precio-esperado-unico').textContent.replace(/[^0-9.-]+/g, "") : null;
+
+        const data = {
+            iduser,
+            modo,
+            ciudad,
+            distrito,
+            barrio,
+            calle,
+            tipo_vivienda,
+            m2,
+            num_habitaciones,
+            num_banos,
+            planta,
+            terraza,
+            balcon,
+            ascensor,
+            estado,
+            precio_minimo,
+            precio_esperado,
+            precio_maximo,
+            precio_esperado_unico
+        };
+        console.log("DATA VALORACIONES", data)
+        fetch('/home/guardar_valoracion/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+        fetch('/home/ventas/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/home/ventas';
+                } else {
+                    alert('Hubo un error al enviar los datos.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const precioEsperado = document.getElementById('precio-esperado-unico');
+    precioEsperado.addEventListener('input', function () {
+        const regex = /^[0-9]*[.,]?[0-9]*$/;
+        const valor = this.textContent.trim();
+
+        if (!regex.test(valor)) {
+            this.textContent = valor.replace(/[^0-9.,]/g, '');
+        }
+    });
+    precioEsperado.addEventListener('blur', function () {
+        const valor = this.textContent.trim();
+
+        const valorNormalizado = valor.replace(',', '.');
+
+        if (!isNaN(parseFloat(valorNormalizado)) && valorNormalizado !== '') {
+            this.textContent = parseFloat(valorNormalizado).toFixed(2);
+        } else {
+            this.textContent = '';
+        }
+    });
+
+    precioEsperado.addEventListener('paste', function (event) {
+        event.preventDefault();
+        const textoPegado = (event.clipboardData || window.clipboardData).getData('text');
+        const textoValidado = textoPegado.replace(/[^0-9.,]/g, '');
+        document.execCommand('insertText', false, textoValidado);
+    });
+
+    document.getElementById('valorar').addEventListener('click', async function () {
+        const iduser = "{{user_id}}";
+        const modo = "valoracion";
+        const ciudad = document.getElementById('ciudad').value;
+        const distrito = document.getElementById('distrito').value;
+        const barrio = document.getElementById('barrio').value;
+        const calle = document.getElementById('calle').value;
+        const tipo_vivienda = parseInt(document.getElementById('tipo-vivienda').value, 10);
+        const m2 = parseInt(document.getElementById('metros-cuadrados').value, 10);
+        const num_habitaciones = parseInt(document.getElementById('num-habitaciones').value, 10);
+        const num_banos = parseInt(document.getElementById('num-banos').value, 10);
+        const planta = document.getElementById('planta').value;
+        const terraza = parseInt(document.getElementById('tiene-terraza').value)
+        const balcon = parseInt(document.getElementById('tiene-balcon').value)
+        const ascensor = parseInt(document.getElementById('tiene-ascensor').value)
+        const estado = document.getElementById('estado-inmueble').value;
+        const data = {
+            iduser,
+            modo,
+            ciudad,
+            distrito,
+            barrio,
+            calle,
+            tipo_vivienda,
+            m2,
+            num_habitaciones,
+            num_banos,
+            planta,
+            terraza,
+            balcon,
+            ascensor,
+            estado
+        };
+        console.log("DATOS REGISTRADOS"+JSON.stringify(data))
+        try {
+            const prediccionResponse = await fetch('http://3.149.1.189/api/prediccion/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!prediccionResponse.ok) {
+                throw new Error(`Error al obtener predicción. Status: ${prediccionResponse.status}`);
+            }
+            
+            const precio_esperado_unico = document.getElementById('precio-esperado-unico')
+                ? parseFloat(
+                    document.getElementById('precio-esperado-unico').textContent.replace(/[^0-9.-]+/g, "")
+                ) || 0 
+                : 0;  
+
+            const responseData = await prediccionResponse.json();
+            console.log('Datos recibidos de la API:', responseData);
+
+            document.getElementById('precio-minimo').textContent = responseData.precio_minimo.toFixed(2);
+            document.getElementById('precio-esperado').textContent = responseData.precio_esperado.toFixed(2);
+            document.getElementById('precio-maximo').textContent = responseData.precio_maximo.toFixed(2);
+
+            /*const radarResponse = await fetch('/home/get_radar_data/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    ciudad: data.ciudad,
+                    distrito: data.distrito,
+                    barrio: data.barrio,
+                    tipo_vivienda: data.tipo_vivienda,
+                    m2: data.m2,
+                    num_habitaciones: data.num_habitaciones,
+                    num_banos: data.num_banos,
+                    precio_esperado: responseData.precio_esperado,
+                    terraza: data.terraza,
+                    balcon: data.balcon,
+                    ascensor: data.ascensor
+                })
+            });*/
+            /*const radarData = await radarResponse.json();
+            renderRadarChart(radarData, data.barrio);*/
+            data.precio_minimo = responseData.precio_minimo;
+            data.precio_esperado = responseData.precio_esperado;
+            data.precio_maximo = responseData.precio_maximo;
+
+
+            data.precio_esperado_unico = precio_esperado_unico;
+
+            const guardarResponse = await fetch('/home/guardar_valoracion/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!guardarResponse.ok) {
+                throw new Error(`Error al guardar la valoración. Status: ${guardarResponse.status}`);
+            }
+
+            console.log('Valoración guardada correctamente.');
+        } catch (error) {
+            console.error('Error completo:', error);
+        }
+    });
+
+    function renderRadarChart(radarData, barrio) {
+        if (window.radarChart) window.radarChart.destroy();
+
+        const ctx = document.getElementById('radar-chart').getContext('2d');
+
+        // Configuración idéntica a Streamlit
+        window.radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['m²', 'Habitaciones', 'Baños', 'Precio'],
+                datasets: [
+                    {
+                        label: 'Otras viviendas del barrio',
+                        data: [
+                            radarData.valores_medios.m2,
+                            radarData.valores_medios.habitaciones,
+                            radarData.valores_medios.banos,
+                            radarData.valores_medios.precio
+                        ],
+                        backgroundColor: 'rgba(0, 128, 255, 0.2)',
+                        borderColor: 'rgba(0, 128, 255, 0.7)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(0, 128, 255, 1)'
+                    },
+                    {
+                        label: 'Vivienda elegida',
+                        data: [
+                            radarData.valores_usuario.m2,
+                            radarData.valores_usuario.habitaciones,
+                            radarData.valores_usuario.banos,
+                            radarData.valores_usuario.precio
+                        ],
+                        backgroundColor: 'rgba(0, 255, 128, 0.2)',
+                        borderColor: 'rgba(0, 255, 128, 0.7)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(0, 255, 128, 1)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            color: 'black',
+                            callback: (value) => `${value}%`
+                        },
+                        grid: { color: 'black' },
+                        angleLines: { color: 'black' }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `COMPARACIÓN DE VIVIENDAS EN EL MISMO BARRIO`,
+                        font: { size: 18 },
+                        color: 'black'
+                    },
+                    legend: {
+                        labels: { color: 'black' }
+                    },
+                    subtitle: {
+                        display: true,
+                        text: [
+                            `En el barrio ${barrio}:`,
+                            `- ${radarData.texto_adicional.porcentajes_barrio.terraza} tienen terraza`,
+                            `- ${radarData.texto_adicional.porcentajes_barrio.balcon} tienen balcón`,
+                            `- ${radarData.texto_adicional.porcentajes_barrio.ascensor} tienen ascensor`
+                        ],
+                        position: 'bottom',
+                        font: { size: 14, color: 'black' },
+                        padding: { top: 20 }
+                    }
+                }
+            }
+        });
+    }
+</script>
+<style>
+    .hidden-column {
+        display: none;
+    }
+
+    body {
+        background-color: #dcdcdc;
+    }
+
+    .welcome-banner {
+        background-color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 1399.98px) {
+        .welcome-banner {
+            z-index: 1000 !important;
+            height: 80px !important;
+            margin-left: 0 !important;
+            padding: 15px 0 !important;
+        }
+
+        .content {
+            margin-left: 0;
+            margin-right: 20;
+            margin-top: 120px;
+        }
+
+        .sidebar {
+            margin-top: 0px;
+        }
+    }
+
+    .content {
+        margin-top: 80px !important;
+        margin-left: 100px !important;
+        padding: 20px;
+    }
+
+    .welcome-banner {
+        background-color: white;
+    }
+
+    .btn-outline-primary {
+        color: #ba31dd;
+        border-color: #ba31dd;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #ba31dd;
+        color: white;
+    }
+
+    .table-bordered {
+        border: 2px solid #000000;
+    }
+
+    .table-bordered th,
+    .table-bordered td {
+        border: 2px solid #000000;
+    }
+
+    .chart-box {
+        width: 100%;
+        max-width: 400px;
+        aspect-ratio: 1 / 1;
+        position: relative;
+        margin: auto;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-box canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
+
+</html>
+{% endblock %}

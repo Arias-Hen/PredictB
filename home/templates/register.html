@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+{% extends 'base.html' %}
+{% block content %}
+
+<body>
+    <div class="container-fluid d-flex justify-content-end align-items-center mt-5">
+        <div class="card p-4 shadow-lg me-5 mt-n5" style="max-width: 500px; width: 100%; background-color: hsl(229, 94%, 31%); border-radius: 20px;">
+            <h3 class="text-white text-center mb-4">CREATE YOUR ACCOUNT</h3>
+            {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-white" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label text-white">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label text-white">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label text-white">Password:</label>
+                    <div></div>
+                    {{ form.password }}                
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label text-white">Confirm Password:</label>
+                    <div></div>
+                    {{ form.confirm_password }}
+                </div>
+                <div class="mb-3 form-check">
+                    <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                    <label class="form-check-label text-white" for="terms">
+                        Acepto los <a href="/home/terminos" class="text-white text-decoration-underline">términos y condiciones</a> establecidos en el Aviso Legal y Política de Privacidad *
+                    </label>
+                </div>
+                <p>
+                    <a href='/home/login/' class="text-decoration-none text-white">
+                        ¿Tienes una cuenta? <br> Iniciar Sesion
+                    </a>
+                </p>
+                <button type="submit" class="btn btn-light w-100 fw-bold">REGISTER</button>
+            </form>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<style>
+    .login-container {
+        position: absolute;
+        top: 52%;
+        right: 14%;
+        transform: translateY(-50%);
+        background-color: hsl(229, 94%, 31%);
+        padding: 2rem;
+        border-radius: 80px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 30%;
+        height: auto;
+    }
+
+    .login-container input {
+        margin-bottom: 1rem;
+        background-color: #fff;
+        color: #333;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .login-container .btn-login {
+        background-color: #fff;
+        color: #000000;
+        font-size: 2.2rem;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 20px;
+        font-weight: bold;
+        display: block;
+        width: auto;
+        margin-left: auto;
+    }
+
+    .login-container h3 {
+        color: white;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: 4rem;
+    }
+
+    .login-container label {
+        font-size: 1.8rem;
+    }
+
+    .login-container a {
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+</html>
+{% endblock %}
