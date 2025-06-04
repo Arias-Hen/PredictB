@@ -1,7 +1,9 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="\home">PREDICTBUILD</a>
+        <div class="container-fluid">
+            {% load static %}
+            <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="85px" height="65px" style="margin:0 20px">
+         <!-- <a class="navbar-brand fw-bold fs-4 ms-2" href="\home">PREDICTBUILD</a> -->   
             <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -30,7 +32,7 @@
                     <li class="nav-item">
                         <div class="d-flex gap-2">
                             <button class="btn btn-dark px-4 shadow-sm" onclick="window.location.href='/home/login'">INICIAR SESIÓN</button>
-                            <button class="btn btn-outline-secondary px-4 shadow-sm" disabled>COMENZAR PRUEBA</button>
+                            <!--<button class="btn btn-outline-secondary px-4 shadow-sm" disabled>COMENZAR PRUEBA</button>-->
                         </div>
                     </li>
                 </ul>

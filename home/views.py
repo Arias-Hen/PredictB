@@ -161,6 +161,7 @@ def ventas(request):
 def informes(request):
     user = request.user
     user_id = user.uniqueid
+    user_nombre = user.nombre
 
     context = []  
     context_json = '{}' 
@@ -219,6 +220,7 @@ def informes(request):
         'context_json': context_json,
         'valoraciones': valoraciones,
         'user_id': user_id,
+        'user_nombre': user.nombre,
     })
 def generarinf(request):
     return render(request, 'generarinf.html')

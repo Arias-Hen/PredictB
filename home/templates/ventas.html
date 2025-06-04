@@ -27,7 +27,8 @@
                     <h4 class="m-0">REGISTRO</h4>
                 </div>
                 <div class="col-md-4 text-center">
-                    <img src="logo.jpeg" alt="Logo" height="40">
+                    {%load static%}
+                    <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="100px" height="50px">
                 </div>
             </div>
             <!-- Barra de búsqueda (azul completo) -->
@@ -45,59 +46,53 @@
             <!-- Filtros (azul completo) -->
             <div class="row g-0 filter-section">
                 <div class="col-12 bg-blue p-2">
-                    <div class="row ms-1">
-                        <div class="col-md-1">
-                            <label>Desde:</label>
+                    <form class="row gx-2 gy-1 align-items-end">
+                        <div class="col-6 col-md-2 col-lg-1">
+                            <label class="form-label mb-1">Desde:</label>
                             <input type="date" class="form-control form-control-sm" id="desde">
                         </div>
-                        <div class="col-md-1">
-                            <label>Hasta:</label>
-                            <input type="date" class="form-control form-control-sm"
-                                style="height: 31px; font-size: 0.9rem;" id="hasta">
+                        <div class="col-6 col-md-2 col-lg-1">
+                            <label class="form-label mb-1">Hasta:</label>
+                            <input type="date" class="form-control form-control-sm" id="hasta">
                         </div>
-
-                        <div class="col-md-1">
-                            <label>Ciudad:</label>
-                            <select id="ciudad_1" class="form-select" style="height: 31px; font-size: 0.9rem;"
-                                aria-label="Seleccionar ciudad" onchange="cargarDistritos('1')"></select>
-
+                        <div class="col-6 col-md-2 col-lg-1">
+                            <label class="form-label mb-1">Ciudad:</label>
+                            <select id="ciudad_1" class="form-select form-select-sm" aria-label="Seleccionar ciudad" onchange="cargarDistritos('1')"></select>
                         </div>
-                        <div class="col-md-1">
-                            <label>Distrito:</label>
-                            <select id="distrito_1" class="form-select" style="height: 31px; font-size: 0.9rem;"
-                                onchange="cargarBarrios('1')"></select>
+                        <div class="col-6 col-md-2 col-lg-1">
+                            <label class="form-label mb-1">Distrito:</label>
+                            <select id="distrito_1" class="form-select form-select-sm" onchange="cargarBarrios('1')"></select>
                         </div>
-                        <div class="col-md-1">
-                            <label>Barrio:</label>
-                            <select id="barrio_1" class="form-select" style="height: 31px; font-size: 0.9rem;"
-                                onchange="cargarCalle('1')"></select>
+                        <div class="col-6 col-md-2 col-lg-1">
+                            <label class="form-label mb-1">Barrio:</label>
+                            <select id="barrio_1" class="form-select form-select-sm" onchange="cargarCalle('1')"></select>
                         </div>
-                        <div class="col-md-1">
-                            <label>Calle:</label>
-                            <select id="calle_1" class="form-select" style="height: 31px; font-size: 0.9rem;"></select>
+                        <div class="col-6 col-md-2 col-lg-1">
+                            <label class="form-label mb-1">Calle:</label>
+                            <select id="calle_1" class="form-select form-select-sm"></select>
                         </div>
-                        <div class="col-md-1">
-                            <label>Tipo:</label>
+                        <div class="col-6 col-md-2 col-lg-1">
+                            <label class="form-label mb-1">Tipo:</label>
                             <select class="form-select form-select-sm">
                                 <option>Valoración</option>
                             </select>
                         </div>
-                        <div class="col-md-1">
-                            <label>Precio Desde:</label>
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label class="form-label mb-1">Precio Desde:</label>
                             <select class="form-select form-select-sm">
                                 <option>200.000</option>
                             </select>
                         </div>
-                        <div class="col-md-1">
-                            <label>Precio Hasta:</label>
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label class="form-label mb-1">Precio Hasta:</label>
                             <select class="form-select form-select-sm">
                                 <option>3.000.000</option>
                             </select>
                         </div>
-                        <div class="col-md-1">
-                            <button class="btn btn-clear btn-sm w-100 mt-4">LIMPIAR FILTROS</button>
+                        <div class="col-12 col-md-2 col-lg-1">
+                            <button type="button" class="btn btn-clear btn-sm w-100 mt-2">LIMPIAR FILTROS</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             <!-- Contenido principal dividido en 2 columnas -->
