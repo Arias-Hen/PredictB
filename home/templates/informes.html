@@ -1,7 +1,3 @@
-{% extends 'sidebar.html' %}
-{% load static %}
-{% block content %}
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,143 +10,148 @@
     <noscript>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     </noscript>
-</head>
+    {% extends 'sidebar.html' %}
+{% load static %}
+{% block content %}
 
-<body>
-    <div class="container-fluid">
-        <!-- Título (azul completo) -->
-        <div class="top-bar d-flex flex-column px-0">
-
-            <div class="row g-0 text-black filters-row align-items-center"
-                style="height: 70px; background-color: white;">
-                <div class="col-md-1 text-start ps-3"></div>
-                <div class="col-md-3">
-                    <h4 class="m-0">INFORMES</h4>
-                </div>
-                <div class="col-md-4 text-center">
-                    <img src="{% static 'images/logo.jpeg' %}" alt="Logo" style="width: 100px; height: 80px; width: auto;">
-                </div>
+<div class="container-fluid p-0 m-0">
+    <!-- Título (azul completo) -->
+    <div class="top-bar d-flex flex-column px-0">
+        <div class="row g-0 text-black filters-row align-items-center" style="height: 70px; background-color: white;">
+            <div class="col-md-1 text-start ps-3"></div>
+            <div class="col-md-3">
+                <h4 class="m-0" style="color: #001ba3;">INFORMES</h4>
             </div>
-            <!-- Barra de búsqueda (azul completo) -->
-            <div class="row g-0">
-                <div class="col-12 bg-blue p-2">
-                    <div class="row ms-1">
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" placeholder="BUSQUE POR DIRECCIÓN">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Filtros (azul completo) -->
-            <div class="row g-0 filter-section">
-                <div class="col-12 bg-blue p-2">
-                    <form class="row gx-2 gy-1 align-items-end">
-                        <div class="col-6 col-md-2 col-lg-1">
-                            <label class="form-label mb-1">Desde:</label>
-                            <input type="date" class="form-control form-control-sm" id="desde">
-                        </div>
-                        <div class="col-6 col-md-2 col-lg-1">
-                            <label class="form-label mb-1">Hasta:</label>
-                            <input type="date" class="form-control form-control-sm" id="hasta">
-                        </div>
-                        <div class="col-6 col-md-2 col-lg-1">
-                            <label class="form-label mb-1">Ciudad:</label>
-                            <select id="ciudad_1" class="form-select form-select-sm" aria-label="Seleccionar ciudad" onchange="cargarDistritos('1')"></select>
-                        </div>
-                        <div class="col-6 col-md-2 col-lg-1">
-                            <label class="form-label mb-1">Distrito:</label>
-                            <select id="distrito_1" class="form-select form-select-sm" onchange="cargarBarrios('1')"></select>
-                        </div>
-                        <div class="col-6 col-md-2 col-lg-1">
-                            <label class="form-label mb-1">Barrio:</label>
-                            <select id="barrio_1" class="form-select form-select-sm" onchange="cargarCalle('1')"></select>
-                        </div>
-                        <div class="col-6 col-md-2 col-lg-1">
-                            <label class="form-label mb-1">Calle:</label>
-                            <select id="calle_1" class="form-select form-select-sm"></select>
-                        </div>
-                        <div class="col-6 col-md-2 col-lg-1">
-                            <label class="form-label mb-1">Tipo:</label>
-                            <select class="form-select form-select-sm">
-                                <option>Valoración</option>
-                            </select>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2">
-                            <label class="form-label mb-1">Precio Desde:</label>
-                            <select class="form-select form-select-sm">
-                                <option>200.000</option>
-                            </select>
-                        </div>
-                        <div class="col-6 col-md-3 col-lg-2">
-                            <label class="form-label mb-1">Precio Hasta:</label>
-                            <select class="form-select form-select-sm">
-                                <option>3.000.000</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-2 col-lg-1">
-                            <button type="button" class="btn btn-clear btn-sm w-100 mt-2">LIMPIAR FILTROS</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="row g-0">
-                <div class="col-lg-12 p-0 m-0">
-                    <!-- Tabla -->
-                    <div class="table-section p-0 m-0">
-                        <table id="valoraciones-table" class="table table-sm table-bordered w-100 m-0">
-                            <thead>
-                                <tr>
-                                    <th>Seleccionar</th>
-                                    <th>Fecha</th>
-                                    <th>Estado</th>
-                                    <th>Precio</th>
-                                    <th>Ubicación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for valoracion in valoraciones %}
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>{{ valoracion.fecha_guardado }}</td>
-                                    <td>{{ valoracion.modo }}</td>
-                                    <td></td>
-                                    <td>{{ valoracion.ciudad }}</td>
-                                    <!-- columnas ocultas -->
-                                    <td class="hidden-column">{{ valoracion.planta }}</td>
-                                    <td class="hidden-column">{{ valoracion.distrito }}</td>
-                                    <td class="hidden-column">{{ valoracion.barrio }}</td>
-                                    <td class="hidden-column">{{ valoracion.calle }}</td>
-                                    <td class="hidden-column">{{ valoracion.tipo_vivienda }}</td>
-                                    <td class="hidden-column">{{ valoracion.estado }}</td>
-                                    <td class="hidden-column">{{ valoracion.m2 }}</td>
-                                    <td class="hidden-column">{{ valoracion.num_habitaciones }}</td>
-                                    <td class="hidden-column">{{ valoracion.num_banos }}</td>
-                                    <td class="hidden-column">{{ valoracion.terraza }}</td>
-                                    <td class="hidden-column">{{ valoracion.balcon }}</td>
-                                    <td class="hidden-column">{{ valoracion.ascensor }}</td>
-                                    <td class="hidden-column">{{ valoracion.precio_minimo }}</td>
-                                    <td class="hidden-column">{{ valoracion.precio_esperado }}</td>
-                                    <td class="hidden-column">{{ valoracion.precio_maximo }}</td>
-                                    <td class="hidden-column">{{ valoracion.precio_esperado_unico }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="table-container" style="text-align: center; margin-top: 20px;">
-                        <button class="export-to-excel btn btn-success btn-primary" style="margin-bottom: 10px;">
-                            Exportar a Excel
-                        </button>
-                        <button class="open-record btn btn-info btn-primary"
-                            style="margin-bottom: 10px; margin-left: 10px;">Abrir</button>
-                    </div>
-                </div>
-
+            <div class="col-md-4 text-center">
+                <img src="{% static 'images/logo.jpeg' %}" alt="Logo" style="width: 100px; height: 80px; object-fit: contain;">
             </div>
         </div>
-</body>
+        <!-- Barra de búsqueda -->
+        <div class="row g-0">
+            <div class="col-12 bg-blue p-2">
+                <div class="row ms-1">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="BUSQUE POR DIRECCIÓN">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Filtros -->
+        <div class="row g-0 filter-section">
+            <div class="col-12 bg-blue p-2">
+                <form class="row gx-2 gy-1 align-items-end">
+                    <div class="col-6 col-md-2 col-lg-1">
+                        <label class="form-label mb-1">Desde:</label>
+                        <input type="date" class="form-control form-control-sm" id="desde">
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-1">
+                        <label class="form-label mb-1">Hasta:</label>
+                        <input type="date" class="form-control form-control-sm" id="hasta">
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-1">
+                        <label class="form-label mb-1">Ciudad:</label>
+                        <select id="ciudad_1" class="form-select form-select-sm" aria-label="Seleccionar ciudad" onchange="cargarDistritos('1')"></select>
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-1">
+                        <label class="form-label mb-1">Distrito:</label>
+                        <select id="distrito_1" class="form-select form-select-sm" onchange="cargarBarrios('1')"></select>
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-1">
+                        <label class="form-label mb-1">Barrio:</label>
+                        <select id="barrio_1" class="form-select form-select-sm" onchange="cargarCalle('1')"></select>
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-1">
+                        <label class="form-label mb-1">Calle:</label>
+                        <select id="calle_1" class="form-select form-select-sm"></select>
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-1">
+                        <label class="form-label mb-1">Tipo:</label>
+                        <select class="form-select form-select-sm">
+                            <option>Valoración</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <label class="form-label mb-1">Precio Desde:</label>
+                        <select class="form-select form-select-sm">
+                            <option>200.000</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <label class="form-label mb-1">Precio Hasta:</label>
+                        <select class="form-select form-select-sm">
+                            <option>3.000.000</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-2 col-lg-1">
+                        <button type="button" class="btn btn-clear btn-sm w-100 mt-2">LIMPIAR FILTROS</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Tabla -->
+        <div class="row g-0">
+            <div class="col-lg-12 p-0 m-0">
+                <div class="table-section p-0 m-0">
+                    <table id="valoraciones-table" class="table table-sm table-bordered w-100 m-0">
+                        <thead>
+                            <tr>
+                                <th>Seleccionar</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Precio</th>
+                                <th>Ubicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for valoracion in valoraciones %}
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>{{ valoracion.fecha_guardado }}</td>
+                                <td>{{ valoracion.modo }}</td>
+                                <td></td>
+                                <td>{{ valoracion.ciudad }}</td>
+                                <!-- columnas ocultas -->
+                                <td class="hidden-column">{{ valoracion.planta }}</td>
+                                <td class="hidden-column">{{ valoracion.distrito }}</td>
+                                <td class="hidden-column">{{ valoracion.barrio }}</td>
+                                <td class="hidden-column">{{ valoracion.calle }}</td>
+                                <td class="hidden-column">{{ valoracion.tipo_vivienda }}</td>
+                                <td class="hidden-column">{{ valoracion.estado }}</td>
+                                <td class="hidden-column">{{ valoracion.m2 }}</td>
+                                <td class="hidden-column">{{ valoracion.num_habitaciones }}</td>
+                                <td class="hidden-column">{{ valoracion.num_banos }}</td>
+                                <td class="hidden-column">{{ valoracion.terraza }}</td>
+                                <td class="hidden-column">{{ valoracion.balcon }}</td>
+                                <td class="hidden-column">{{ valoracion.ascensor }}</td>
+                                <td class="hidden-column">{{ valoracion.precio_minimo }}</td>
+                                <td class="hidden-column">{{ valoracion.precio_esperado }}</td>
+                                <td class="hidden-column">{{ valoracion.precio_maximo }}</td>
+                                <td class="hidden-column">{{ valoracion.precio_esperado_unico }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-container text-center mt-3">
+    <button class="export-to-excel btn btn-danger mb-2 btn-spacing">
+        EXPORTAR A PDF
+    </button>
+    <button class="open-record btn btn-primary mb-2 btn-spacing" style="background-color: #001ba3 !important; color: #fff !important;">
+        Enviar a
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
+        </svg>
+    </button>
+    <button class="open-record btn btn-primary mb-2" style="background-color: #001ba3 !important; color: #fff !important;">
+        Seleccionar Todo
+    </button>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tu JS aquí (sin cambios) -->
 <script>
     document.getElementById('desde').addEventListener('change', filtrarTodo);
     document.getElementById('hasta').addEventListener('change', filtrarTodo);
@@ -680,112 +681,94 @@
 
 </script>
 <style>
-    body,
-    html {
+    html, body {
         margin: 0;
         padding: 0;
         width: 100%;
         overflow-x: hidden;
+        background: #f8f9fa;
     }
-
     .container-fluid {
         padding: 0 !important;
         margin: 0 !important;
         max-width: 100%;
     }
-
-    .col-lg-5 {
-        border-top: 2px solid black;
-        border-right: 2px solid black;
-    }
-
-
     .bg-blue {
         background-color: #001ba3 !important;
     }
-
-    .bg-light-blue {
-        background-color: #ADD8E6 !important;
-    }
-
     .btn-clear {
         background-color: #00e1a1;
         color: white;
+        border: none;
     }
-
+    .btn-clear:hover {
+        background-color: #00997a;
+        color: #fff;
+    }
     .form-section {
         background-color: white;
         padding: 20px;
     }
-
     .table-section {
         background-color: white;
         padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-
     .header-white {
         background-color: white;
         height: 70px;
     }
-
     .filter-section {
         background-color: #001ba3;
         color: white;
         padding: 10px 0;
+        border-radius: 0 0 8px 8px;
     }
-
     #valoraciones-table th {
         padding-top: 0.68rem;
         padding-bottom: 0.68rem;
         background-color: #001ba3;
         color: white;
+        text-align: center;
+        vertical-align: middle;
     }
-
     #valoraciones-table td {
         padding-top: 0.68rem;
         padding-bottom: 0.68rem;
         background-color: white;
         color: black;
+        text-align: center;
+        vertical-align: middle;
     }
-
-
-    button,
-    input[type="button"],
-    input[type="submit"],
-    input[type="reset"],
-    .btn {
-        background-color: #0001a0 !important;
-        color: white !important;
-        border-color: #0001a0 !important;
-    }
-
-    button:hover,
-    input[type="button"]:hover,
-    input[type="submit"]:hover,
-    input[type="reset"]:hover,
-    .btn:hover {
-        background-color: #0000c0 !important;
-        border-color: #0000c0 !important;
-    }
-
     .table-bordered {
         border: 2px solid #000000;
     }
-
     .hidden-column {
         display: none;
     }
-
     .btn-outline-primary {
         color: #001ba3;
         border-color: #001ba3;
     }
-
     .btn-outline-primary:hover {
         background-color: #001ba3;
         color: white;
     }
+    .table-container button {
+        min-width: 150px;
+    }
+    @media (max-width: 991.98px) {
+        .table-section, .filter-section {
+            padding: 10px;
+        }
+        .table-container button {
+            min-width: 100px;
+            font-size: 0.95rem;
+        }
+    }
+    .btn-spacing {
+    margin-right: 20px;
+}
 </style>
-
-</html>
 {% endblock %}

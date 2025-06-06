@@ -1,8 +1,8 @@
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar shadow">
         <div class="container-fluid">
             {% load static %}
-            <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="85px" height="65px" style="margin:0 20px">
+            <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="85px" height="65px" style="margin:0 70px 0 20px">
          <!-- <a class="navbar-brand fw-bold fs-4 ms-2" href="\home">PREDICTBUILD</a> -->   
             <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,37 +11,34 @@
         <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto custom-nav-items">
                     <li class="nav-item">
-                        <a class="nav-link active position-relative fw-medium" href="\home">INICIO</a>
+                        <a class="nav-link active position-relative fw-medium" href="/home/">INICIO</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link position-relative fw-medium" href="\home\cfunciona">CÓMO FUNCIONA</a>
+                        <a class="nav-link position-relative fw-medium" href="/home/#funciona">CÓMO FUNCIONA</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link position-relative fw-medium" href="\home\casos">CASOS DE ÉXITO</a>
+                        <a class="nav-link position-relative fw-medium" href="\home\#casos">CASOS DE ÉXITO</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link position-relative fw-medium" href="\home\contacto">CONTACTO</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item me-3">
-                        <a class="nav-link d-flex align-items-center" href="#">
-                            <span class="bi bi-globe me-1"></span>ES
-                        </a>
-                    </li>
                     <li class="nav-item">
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-dark px-4 shadow-sm" onclick="window.location.href='/home/login'">INICIAR SESIÓN</button>
-                            <!--<button class="btn btn-outline-secondary px-4 shadow-sm" disabled>COMENZAR PRUEBA</button>-->
+                        <div class="d-flex ">
+<button class="btn btn-dark px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal" style="margin-right: 150px;">INICIAR SESIÓN</button>                            <!--<button class="btn btn-outline-secondary px-4 shadow-sm" disabled>COMENZAR PRUEBA</button>-->
                         </div>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+    {% block content %}
+    {% endblock %}
+</body>
     <style>
         .navbar-brand {
-            color: blue !important;
+            color: #0001a0 !important;
             letter-spacing: -0.5px;
         }
 
@@ -59,11 +56,11 @@
 
         .nav-link:hover:not(.active) {
             background: rgba(0, 0, 255, 0.05);
-            color: blue !important;
+            color: #0001a0 !important;
         }
 
         .nav-link.active {
-            color: blue !important;
+            color: #0001a0 !important;
             font-weight: 500 !important;
         }
 
@@ -74,18 +71,18 @@
             left: 12px;
             right: 12px;
             height: 2px;
-            background: blue;
+            background: #0001a0;
             border-radius: 2px;
         }
 
         .btn-dark {
-            background: blue !important;
-            border-color: blue !important;
+            background: #0001a0 !important;
+            border-color: #0001a0 !important;
         }
 
         .btn-dark:hover {
-            background: #0000cc !important;
-            border-color: #0000cc !important;
+            background: #0001a0 !important;
+            border-color: #0001a0 !important;
         }
 
         .btn-outline-secondary {
@@ -93,6 +90,39 @@
             color: #666 !important;
         }
     </style>
-    {% block content %}
-    {% endblock %}
-</body>
+
+<!-- Modal de Login -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:24px;">
+      <div class="modal-body p-0">
+        <div class="card p-4" style="border-radius:24px; background: linear-gradient(135deg, #0001a0 70%, #2a3cff 100%);">
+          <div class="text-center mb-3">
+            <img src="{% static 'images/logo.jpeg' %}" alt="Logo PredictBuild" width="70" class="mb-2 rounded shadow-sm">
+            <h3 class="text-white mb-2">Inicia Sesión</h3>
+            <p class="text-white-50 mb-0">Accede a tu cuenta PredictBuild</p>
+          </div>
+          <form method="POST" action="/home/login/" autocomplete="off">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="username" class="form-label text-white">Usuario o Correo electrónico</label>
+              <input type="text" class="form-control form-control-lg" id="username" name="username" required autocomplete="username">
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label text-white">Contraseña</label>
+              <input type="password" class="form-control form-control-lg" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+              <a href="/home/password_reset/" class="small text-white-50 text-decoration-none">¿Olvidaste tu contraseña?</a>
+            </div>
+            <button type="submit" class="btn btn-light w-100 fw-bold py-2 mb-2" style="border-radius: 16px;">Iniciar Sesión</button>
+          </form>
+          <div class="text-center mt-2">
+            <span class="text-white-50">¿No tienes cuenta?</span>
+            <a href="/home/register/" class="text-white fw-bold text-decoration-underline">Regístrate</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -17,30 +17,16 @@
       />
     </noscript>
     {% extends 'sidebar.html' %} {% block content %} {%load static%}
-    <div
-      class="welcome-banner shadow-sm bg-white"
-      style="margin-left: 150px; z-index: 1000;"
-    >
-      <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-2"></div>
-          <div class="col-4 text-start">
-            <h1
-              class="fw-bold text-decoration-underline mb-0 valoracion-title"
-              style="color: #0001a0; font-size: 1.5rem"
-            >
-              VALORACIÓN
-            </h1>
-          </div>
-          <div class="col-6 text-start">
-            <img
-              src="{% static 'images/logo.jpeg' %}"
-              alt="PredictBuild Logo"
-              style="height: 80px; display: block; margin-left: 50px;"
-            />
-          </div>
+    <div class="row g-0 text-black filters-row align-items-center"
+        style="height: 70px; background-color: white;">
+        <div class="col-md-1 text-start ps-3"></div>
+        <div class="col-md-3">
+            <h4 class="m-0" style="color: #001ba3;">VALORACIÓN</h4>
         </div>
-      </div>
+        <div class="col-md-4 text-center">
+            {%load static%}
+            <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="100px" height="70px">
+        </div>
     </div>
   </head>
 
@@ -813,39 +799,8 @@
       background-color: #dcdcdc;
     }
 
-    .welcome-banner {
-      background-color: white;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .valoracion-title {
-      font-size: 2.2rem;
-      word-break: break-word;
-    }
-
-    @media (max-width: 991.98px) {
-      .valoracion-title {
-        font-size: 1.5rem;
-      }
-    }
-
-    @media (max-width: 575.98px) {
-      .valoracion-title {
-        font-size: 1.1rem;
-      }
-    }
-
     @media (max-width: 1399.98px) {
-      .welcome-banner {
-        z-index: 1000 !important;
-        height: 100px !important;
-        margin-left: 0 !important;
-        padding: 5px 0 !important;
-        margin-bottom: 40px 0 !important; 
-      }
+
 
       .content {
         margin-left: 0;

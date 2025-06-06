@@ -4,146 +4,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PredictBuid</title>
+    <title>PredictBuild</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
 </head>
-{% extends 'base.html' %}
-{% block content %}
 
-<div class="hero">
-    <div class="container mt-20">
-        <h1>VALORACIÓN INMOBILIARIA DE ALTA PRECISIÓN</h1>
-        <p>Gestiona predicciones, ventas, análisis de mercado y crea informes profesionales en un mismo lugar</p>
-        <a href="/home/inicio" class="btn btn-primary btn-lg">CONOCE MÁS SOBRE PREDICTBUILD</a>
-    </div>
-</div>
-<section class="container-fluid mt-5">
-    <div class="row">
-        <div class="col-12 col-md-7 mt-5 mx-auto px-5">
-            <h1 class="text-center">TRANSFORMA LA TASACIÓN INMOBILIARIA CON PREDICTBUILD</h1>
-            <p class="text-justify mt-3">
-                Predictbuild es un software revolucionario que simplifica y optimiza el proceso de tasación de
-                propiedades utilizando inteligencia artificial avanzada. Diseñado para profesionales del sector
-                inmobiliario, Predictbuild no solo facilita la estimación precisa de precios, sino que ofrece
-                herramientas estratégicas para la toma de decisiones fundamentadas.
+<body>
+    
+    {% extends 'base.html' %}
+    {% load static %}
+    {% block content %}
+
+    <div class="hero" id="inicio">
+        <div class="container">
+            <h1>PredictBuild</h1>
+            <h1>VALORACIÓN INMOBILIARIA DE ALTA PRECISIÓN</h1>
+            <p>GESTIONA PREDICCIONES, VENTAS, ANÁLISIS DE MERCADO Y CREA INFORMES <br> PROFESIONALES EN UN MISMO LUGAR
             </p>
+            <a href="#funciona" class="btn btn-primary btn-lg btn-conocer-mas">CONOCE MÁS SOBRE <br>PREDICTBUILD</a>
         </div>
-        <div class="col-12 col-md-5 mb-4">
-            <div class="card-body">
-                <form>
-                    <div class="circle-cont text-center p-3 mb-4"
-                        style="border: 3px solid #2a00a2; border-radius: 20px;">
-                        <h3>BIENVENIDO A PREDICTBUILD</h3>
-                        <div class="row">
-                            <div class="col-12 col-md-6">
-                                <h5>INGRESAR DATOS</h5>
-                                <div class="mb-3">
-                                    <label for="metros" class="form-label">Metros Cuadrados Construidos</label>
-                                    <input type="number" class="form-control" id="metros">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="tipoVivienda" class="form-label">Tipo de Vivienda</label>
-                                    <input type="text" class="form-control" id="tipoVivienda">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="habitaciones" class="form-label">Número de Habitaciones</label>
-                                    <input type="number" class="form-control" id="habitaciones">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="banos" class="form-label">Número de Baños</label>
-                                    <input type="number" class="form-control" id="banos">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="reforma" class="form-label">Reforma</label>
-                                    <input type="text" class="form-control" id="reforma">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="barrio" class="form-label">Barrio</label>
-                                    <input type="text" class="form-control" id="barrio">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="zona" class="form-label">Zona del Barrio</label>
-                                    <input type="text" class="form-control" id="zona">
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <div class="circle-container text-center p-3"
-                                    style="border: 3px solid #2a00a2; border-radius: 50%;">
-                                    <h5>INGRESAR DATOS</h5>
-                                    <p>Terraza/ Patio</p>
-                                    <div>
-                                        <input type="radio" id="terraza-si" name="terraza" value="SI">
-                                        <label for="terraza-si">SI</label>
-                                        <input type="radio" id="terraza-no" name="terraza" value="NO">
-                                        <label for="terraza-no">NO</label>
-                                    </div>
-                                    <p>Ascensor</p>
-                                    <div>
-                                        <input type="radio" id="ascensor-si" name="ascensor" value="SI">
-                                        <label for="ascensor-si">SI</label>
-                                        <input type="radio" id="ascensor-no" name="ascensor" value="NO">
-                                        <label for="ascensor-no">NO</label>
-                                    </div>
-                                </div>
-                                <div class="rectangle-container text-center p-3 mb-4"
-                                    style="border: 3px solid #2a00a2; border-radius: 20px;">
-                                    <h5>COMISIÓN DE LA INMOBILIARIA</h5>
-                                    <input type="text" class="form-control" placeholder="Comisión estimada (euros)">
-                                </div>
+    </div>
 
-                                <div class="rectangle-container text-center p-3 mb-4"
-                                    style="border: 3px solid #2a00a2; border-radius: 20px;">
-                                    <h5>RESULTADOS</h5>
-                                    <input type="text" class="form-control"
-                                        placeholder="Rango de precio estimado (euros)">
+    <section id="descripcion" class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-12 col-md-7 mt-5 mx-auto px-5" style="font-size: 1.4rem;">
+                <h3 class="fw-bold" style="color: #0001a0;">TRANSFORMA LA TASACIÓN INMOBILIARIA CON PREDICTBUILD</h3>
+                <p class="mt-3">
+                    Predictbuild es un software revolucionario que simplifica y optimiza el proceso
+                    de tasación de propiedades utilizando inteligencia artificial avanzada. Diseñado
+                    para profesionales del sector inmobiliario, Predictbuild no solo facilita la
+                    estimación precisa de precios, sino que ofrece herramientas estratégicas para
+                    la toma de decisiones fundamentadas.
+                </p>
+                <p class="mt-4">
+                    Imagina poder estimar el valor de una propiedad en segundos, con una
+                    precisión impecable y sin procesos manuales tediosos. Predictbuild es la
+                    herramienta revolucionaria que optimiza y simplifica la tasación utilizando
+                    inteligencia artificial avanzada. Diseñado para profesionales del sector
+                    inmobiliario, este software no solo te permite obtener valoraciones precisas en
+                    un minuto.
+                </p>
+                <p class="mt-4">
+                    Ahorra tiempo, maximiza oportunidades y lleva tu negocio al siguiente nivel con
+                    la tecnología que está cambiando el mercado.
+                </p>
+                <p class="mt-4">
+                    Si eres profesional del sector inmobiliario, Predictbuild es tu ventaja
+                    competitiva. ¡Haz que cada tasación cuente!
+                </p>
+            </div>
+            <div class="col-12 col-md-5 mb-4">
+                <div class="card-body">
+                    <form>
+                        <div class="circle-cont text-center p-3 mb-4"
+                            style="border: 3px solid #2a00a2; border-radius: 20px;">
+                            <h3>BIENVENIDO A PREDICTBUILD</h3>
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <h5>INGRESAR DATOS</h5>
+                                    <div class="mb-3">
+                                        <label for="metros" class="form-label">Metros Cuadrados Construidos</label>
+                                        <input type="number" class="form-control" id="metros">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tipoVivienda" class="form-label">Tipo de Vivienda</label>
+                                        <input type="text" class="form-control" id="tipoVivienda">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="habitaciones" class="form-label">Número de Habitaciones</label>
+                                        <input type="number" class="form-control" id="habitaciones">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="banos" class="form-label">Número de Baños</label>
+                                        <input type="number" class="form-control" id="banos">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reforma" class="form-label">Reforma</label>
+                                        <input type="text" class="form-control" id="reforma">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="barrio" class="form-label">Barrio</label>
+                                        <input type="text" class="form-control" id="barrio">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="zona" class="form-label">Zona del Barrio</label>
+                                        <input type="text" class="form-control" id="zona">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="circle-container text-center p-3"
+                                        style="border: 3px solid #2a00a2; border-radius: 50%;">
+                                        <h5>INGRESAR DATOS</h5>
+                                        <p>Terraza/ Patio</p>
+                                        <div>
+                                            <input type="radio" id="terraza-si" name="terraza" value="SI">
+                                            <label for="terraza-si">SI</label>
+                                            <input type="radio" id="terraza-no" name="terraza" value="NO">
+                                            <label for="terraza-no">NO</label>
+                                        </div>
+                                        <p>Ascensor</p>
+                                        <div>
+                                            <input type="radio" id="ascensor-si" name="ascensor" value="SI">
+                                            <label for="ascensor-si">SI</label>
+                                            <input type="radio" id="ascensor-no" name="ascensor" value="NO">
+                                            <label for="ascensor-no">NO</label>
+                                        </div>
+                                    </div>
+                                    <div class="rectangle-container text-center p-3 mb-4"
+                                        style="border: 3px solid #2a00a2; border-radius: 20px;">
+                                        <h5>COMISIÓN DE LA INMOBILIARIA</h5>
+                                        <input type="text" class="form-control" placeholder="Comisión estimada (euros)">
+                                    </div>
+                                    <div class="rectangle-container text-center p-3 mb-4"
+                                        style="border: 3px solid #2a00a2; border-radius: 20px;">
+                                        <h5>RESULTADOS</h5>
+                                        <input type="text" class="form-control"
+                                            placeholder="Rango de precio estimado (euros)">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Calcular</button>
-                </form>
+                        <button type="submit" class="btn btn-primary w-100">Calcular</button>
+                    </form>
+                </div>
             </div>
         </div>
+    </section>
+    <section id="funciona" class="container mt-5">
+        <h2 class="text-center fw-bold">¿CÓMO FUNCIONA PREDICTBUILD?</h2>
+        <h3 class="text-justify mt-5 fw-bold">ES RÁPIDO, FÁCIL Y PRECISO:</h3>
+        <h3 class="mt-5 fw-bold">Ingresa los Datos de la Propiedad:</h3>
+        <p class="text-justify">
+            Solo necesitas proporcionar información básica: ubicación, tamaño, antigüedad y características
+            principales de la propiedad.
+        </p>
+        <h3 class="mt-5 fw-bold">Analisis inteligente</h3>
+        <p style="text-align: justify;">
+            Nuestra IA procesa la información y la compara con una base de datos extensa, analizando
+            propiedades similares y tendencias actuales del mercado.
+        </p>
+        <h3 class="mt-5 fw-bold">Obten el precio estimado</h3>
+        <p style="text-align: justify;">
+            Recibe una valoración precisa y detallada en cuestión de segundos, con gráficos y reportes que
+            facilitan el análisis.
+        </p>
+        <h2 class="mt-5 text-center">CARACTERÍSTICAS CLAVE</h2>
+        <h3 class="mt-5">1. Valoraciones</h3>
+        <p style="text-align: justify;">
+            Obtén el precio estimado de cualquier propiedad en <b>segundos.</b> <br>
+            Accede a <b>gráficos interactivos</b> con información clave del mercado para tomar decisiones más inteligentes.
+        </p>
+        <h3 class="mt-5">2. Gestión de Operaciones/tasaciones (mis ventas)</h3>
+        <p style="text-align: justify;">
+            Registra y gestiona <b>todas tus tasaciones y ventas</b> en un solo lugar. <br>
+            Organiza tu Catálogo de propiedades de manera eficiente y sin esfuerzo.
+        </p>
+        <h3 class="mt-5">3. Informes:</h3>
+        <p style="text-align: justify;">
+            Optimiza tu flujo de trabajo con nuestra plataforma inteligente. Almacena, organiza y accede a todos tus informes
+            en un solo lugar. Encuentra rápidamente la información que necesitas con nuestro sistema de búsqueda por
+            fecha, dirección y precio.
+        </p>
+        <h3 class="mt-5">4. Generador Informes:</h3>
+        <p style="text-align: justify;">
+            Genera reportes profesionales en segundos con la potencia de la inteligencia artificial.
+            Nuestra plataforma te permite crear informes personalizados de tus valoraciones o ventas incluyendo,
+            análisis de mercado detallados y gráficos clave que potencian la presentación.
+            Además, puedes exportarlos fácilmente en formatos profesionales como PDF,
+            asegurando que siempre cuentes con documentos listos para compartir y presentar.
+        </p>
+        <h2 class="mt-5 text-center">¿POR QUÉ ELEGIR PREDICTBUILD?</h2>
+        <p class="mt-4"><strong style=" color: #0001A0;">Precisión inigualable:</strong> Nuestros modelos de IA te ofrecen valoraciones fiables y basadas en datos reales.</p>
+        <p class="mt-4"><strong style=" color: #0001A0;">Optimización de Decisiones:</strong> Inversiones seguras: Reduce riesgos y toma decisiones informadas y estratégicas en el sector inmobiliario.</p>
+        <p class="mt-4"><strong style=" color: #0001A0;">Ahorro de Tiempo</strong> Automatiza el análisis y obtén informes detallados sin procesos manuales.</p>
+        <p class="mt-4"><strong style=" color: #0001A0;">Captación de clientes</strong> Convierte tu escaparate y tarjetas de visita en potentes imanes de clientes. Implementa <strong style="color: #0001A0; font-weight: bold;">PredictBuild</strong> y genera más interacción, más ventas y más oportunidades</p>
+        <h2 class="mt-5 text-center">POTENCIA TU NEGOCIO CON TECNOLOGÍA AVANZADA.¡HAZLO FÁCIL, HAZLO CON PREDICTBUILD!</h2>
+        <p style="text-align: justify;">Solicita una demostración gratuita y descubre cómo Predictbuild puede
+            transformar tus operaciones.</p>
+        <div class="d-flex justify-content-center align-items-center">
+            <button class="btn btn-primary" onclick="window.location.href='/home/contacto'">AGENDA UNA <br>
+                CONSULTA</button>
+        </div>
+        <div style="height: 40px;"></div>
+    </section>
+    <div id="casos" class="vh-100 d-flex flex-column justify-content-center" style="min-height: 100vh;">
+        <section class="container mt-5 flex-shrink-0" >
+            <h1 class="text-center ">¿POR QUÉ LAS EMPRESAS CONFÍAN EN PREDICTBUILD?</h1>
+            <h2 class="text-center">
+                DESCUBRE CÓMO PREDICTBUILD ESTÁ REVOLUCIONANDO LA PREDICCIÓN DE PRECIOS INMOBILIARIOS.
+            </h2>
+        </section>
+        <section class="container mt-5 flex-shrink-0">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="video-placeholder d-flex justify-content-center align-items-center"
+                        style="background-color: #ccc; height: 250px;">
+                        <span class="text-center">Video aquí</span>
+                    </div>
+                    <p>Predictbuild transformó la forma en que evaluamos inversiones. Ahora,
+                        nuestras decisiones se basan en predicciones precisas y datos reales.
+                        <br><br>
+                        Nombre del Cliente: Juan Pérez<br>
+                        Cargo: Inversionista en Grupo Inmobiliario Pérez
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <div class="video-placeholder d-flex justify-content-center align-items-center"
+                        style="background-color: #ccc; height: 250px;">
+                        <span class="text-center">Video aquí</span>
+                    </div>
+                    <p>Gracias a Predictbuild, pudimos ofrecer a nuestros clientes estimaciones
+                        de precios mucho más exactas, lo que aumentó nuestra credibilidad y
+                        ventas.<br><br>
+                        Nombre del Cliente: María Gómez<br>
+                        Cargo: Directora de Operaciones en Agencia XYZ</p>
+                </div>
+            </div>
+        </section>
     </div>
-</section>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <section class="container mt-5">
+        <h1 class="text-center fs-3">¿QUIERES PREDECIR EL VALOR DE CADA PROPIEDAD CON LA MÁS ALTA PRECISIÓN?</h1>
+        <p class="text-center fs-5">
+            Solicita una demostración gratuita y descubre cómo Predictbuild puede optimizar tu proceso de tasación
+            inmobiliaria.
+        </p>
+        <div class="d-flex justify-content-center align-items-center">
+            <button class="btn btn-primary" onclick="window.location.href='/home/contacto'">AGENDA UNA <br> CONSULTA</button>
+        </div>
+    </section>
+    <footer class="footer-ignite mt-5 pt-5 pb-2">
+        <div class="container">
+            <div class="row text-white align-items-center">
+                <div class="col-12 col-md-4 mb-3 mb-md-0">
+                    <div class="fw-bold small mb-2">GUÍA DE MUNICIPIOS</div>
+                    <div><a href="#" class="footer-link">BARCELONA</a></div>
+                    <div><a href="#" class="footer-link">MADRID</a></div>
+                </div>
+                <div class="col-12 col-md-4 mb-3 mb-md-0">
+                    <div class="fw-bold small mb-2">&nbsp;</div>
+                    <div><a href="#" class="footer-link">AVISO LEGAL</a></div>
+                    <div><a href="#" class="footer-link">POLÍTICA DE COOKIES</a></div>
+                    <div><a href="#" class="footer-link">POLÍTICA DE PRIVACIDAD</a></div>
+                </div>
+                
+                <div class="col-12 col-md-4 text-md-start">
+                    <img src="{% static 'images/logo-igniteai-blanco.png' %}" alt="IgniteAI" style="height:40px; margin-bottom: 30px;">
+                    <div class="small mb-2">
+                        <span class="me-2"><i class="bi bi-envelope"></i> CONTACTO@IGNITEAICONSULTOR.COM</span>
+                    </div>
+                    <div class="mb-2">
+                        <a href="#" class="footer-link me-2 d-block"><i class="bi bi-linkedin"></i> LINKEDIN</a>
+                        <a href="#" class="footer-link"><i class="bi bi-twitter"></i> TWITTER</a>
+                    </div>
+                    <div class="small mt-2">&copy; IGNITEAI - TODOS LOS DERECHOS RESERVADOS</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 <style>
-    .navbar-brand {
-        font-weight: bold;
-        font-size: 1.5rem;
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        background-color: #ffffff;
+        color: #000000;
+    }
+    .btn-dark {
+        background: #0001a0 !important;
+        border-color: #0001a0 !important;
     }
 
-    
-    .hero {
-        background-size: cover;
-        background-position: center;
+    .btn-dark:hover {
+        background: #0001a0 !important;
+        border-color: #0001a0 !important;
+    }
+
+    .btn-outline-secondary {
+        border-color: #ddd !important;
+        color: #666 !important;
+    }
+
+    h1,
+    h2,
+    h3 {
+        color: #0001A0;
+        font-weight: bold;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    h1 {
+        color: #0001a0;
+        font-weight: bold;
+    }
+
+    p {
+        font-size: 1.2rem;
+    }
+
+        .hero {
+        position: relative;
+        background: none;
         color: #000000;
         text-align: center;
         padding: 100px 20px;
         min-height: 100vh;
         display: flex;
-        align-items: center;
         justify-content: center;
         overflow: hidden;
     }
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: url("{% static 'images/imagen_principal_frontend.png' %}");
+        background-size: cover;
+        background-position: center;
+        opacity: 0.3;
+        z-index: 0;
+    }
+    .hero > .container {
+        position: relative;
+        z-index: 1;
+    }
 
     .hero h1 {
-        font-size: 2.5rem;
+        font-size: 2.1rem;
         font-weight: bold;
+        color: #0001a0;
     }
 
     .hero p {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         margin-bottom: 30px;
     }
 
     .btn-primary {
-        background-color: #00008b;
+        background-color: #0001a0;
         border: none;
     }
-</style>
 
-</html>
+    .btn-conocer-mas {
+        font-size: 1.1rem !important;
+        line-height: 1.4;
+        padding: 0.75rem 1.25rem;
+    }
+
+    .circle-cont,
+    .rectangle-container,
+    .circle-container {
+        background: #fff;
+    }
+
+    .circle-cont {
+        border-radius: 20px;
+    }
+
+    .circle-container {
+        border-radius: 50%;
+    }
+
+    .rectangle-container {
+        border-radius: 20px;
+    }
+
+    .video-placeholder {
+        background-color: #ccc;
+        height: 250px;
+        border-radius: 12px;
+    }
+
+    .footer-ignite {
+        background: #0001a0;
+        color: #fff;
+        font-size: 0.95rem;
+        border-top: 2px solid #fff;
+        letter-spacing: 0.02em;
+    }
+
+    .footer-ignite .footer-link {
+        color: #fff;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.2s;
+    }
+
+    .footer-ignite .footer-link:hover {
+        text-decoration: underline;
+        color: #b3c6ff;
+    }
+
+    .footer-ignite img {
+        max-width: 120px;
+        margin-bottom: 10px;
+    }
+
+    .footer-ignite .bi {
+        font-size: 1.1em;
+        vertical-align: middle;
+        margin-right: 4px;
+    }
+
+    @media (max-width: 991.98px) {
+        .footer-ignite .text-md-end,
+        .footer-ignite .text-md-center {
+            text-align: left !important;
+            align-items: flex-start !important;
+        }
+
+        .footer-ignite img {
+            margin-bottom: 1rem;
+        }
+
+        .footer-ignite .col-md-3 {
+            margin-bottom: 1.5rem;
+        }
+
+        .hero {
+            padding: 0 10px;
+            min-height: 100vh;
+            height: 100vh;
+        }
+    }
+    </style>
 {% endblock %}
+</html>

@@ -24,11 +24,11 @@
                 style="height: 70px; background-color: white;">
                 <div class="col-md-1 text-start ps-3"></div>
                 <div class="col-md-3">
-                    <h4 class="m-0">REGISTRO</h4>
+                    <h4 class="m-0" style="color: #001ba3;">REGISTRO</h4>
                 </div>
                 <div class="col-md-4 text-center">
                     {%load static%}
-                    <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="100px" height="50px">
+                    <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="100px" height="70px">
                 </div>
             </div>
             <!-- Barra de búsqueda (azul completo) -->
@@ -57,15 +57,18 @@
                         </div>
                         <div class="col-6 col-md-2 col-lg-1">
                             <label class="form-label mb-1">Ciudad:</label>
-                            <select id="ciudad_1" class="form-select form-select-sm" aria-label="Seleccionar ciudad" onchange="cargarDistritos('1')"></select>
+                            <select id="ciudad_1" class="form-select form-select-sm" aria-label="Seleccionar ciudad"
+                                onchange="cargarDistritos('1')"></select>
                         </div>
                         <div class="col-6 col-md-2 col-lg-1">
                             <label class="form-label mb-1">Distrito:</label>
-                            <select id="distrito_1" class="form-select form-select-sm" onchange="cargarBarrios('1')"></select>
+                            <select id="distrito_1" class="form-select form-select-sm"
+                                onchange="cargarBarrios('1')"></select>
                         </div>
                         <div class="col-6 col-md-2 col-lg-1">
                             <label class="form-label mb-1">Barrio:</label>
-                            <select id="barrio_1" class="form-select form-select-sm" onchange="cargarCalle('1')"></select>
+                            <select id="barrio_1" class="form-select form-select-sm"
+                                onchange="cargarCalle('1')"></select>
                         </div>
                         <div class="col-6 col-md-2 col-lg-1">
                             <label class="form-label mb-1">Calle:</label>
@@ -90,7 +93,7 @@
                             </select>
                         </div>
                         <div class="col-12 col-md-2 col-lg-1">
-                            <button type="button" class="btn btn-clear btn-sm w-100 mt-2">LIMPIAR FILTROS</button>
+                            <button type="button" class="btn btn btn-hover-green me-2 btn-sm w-100 mt-2">LIMPIAR FILTROS</button>
                         </div>
                     </form>
                 </div>
@@ -199,7 +202,8 @@
                                 <div class="row mt-4">
                                     <div class="col-6">
                                         <div class="text-center">
-                                            <button type="button" class="btn btn-outline-primary fw-bold w-100 py-2"
+                                            <!-- Botones Registrar y Generar Informe -->
+                                            <button type="button" class="btn fw-bold w-100 py-2 btn-hover-blue"
                                                 id="registrarinf">
                                                 REGISTRAR
                                             </button>
@@ -207,7 +211,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="text-center">
-                                            <button type="button" class="btn btn-outline-primary fw-bold w-100 py-2"
+                                            <button type="button" class="btn fw-bold w-100 py-2 btn-hover-blue"
                                                 id="generarinf2" onclick="window.location.href='/home/generarinf'">
                                                 GENERAR INFORME
                                             </button>
@@ -268,12 +272,16 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="table-container" style="text-align: center; margin-top: 20px;">
-                        <button class="export-to-excel btn btn-success btn-primary" style="margin-bottom: 10px;">
+
+                    <div class="table-container text-center mt-3" style="text-align: center; margin-top: 20px;">
+                        <!-- Botones debajo de la tabla -->
+                        <button class="open-record btn btn-hover-blue me-2" style="margin-bottom: 10px;">Cargar
+                            Datos</button>
+                        <button class="export-to-excel btn btn-hover-green me-2" style="margin-bottom: 10px;">
                             Exportar a Excel
                         </button>
-                        <button class="open-record btn btn-info btn-primary"
-                            style="margin-bottom: 10px; margin-left: 10px;">Abrir</button>
+                        <button class="open-record btn btn-hover-blue" style="margin-bottom: 10px;">Seleccionar
+                            Todo</button>
                     </div>
                 </div>
 
@@ -839,10 +847,10 @@
             balcon,
             ascensor,
             estado,
-            precio_minimo:0,
-            precio_esperado:0,
-            precio_maximo:0,
-            precio_esperado_unico:0,
+            precio_minimo: 0,
+            precio_esperado: 0,
+            precio_maximo: 0,
+            precio_esperado_unico: 0,
 
         };
         console.log("DATOS REGISTRADOS" + JSON.stringify(data))
@@ -883,7 +891,6 @@
     .col-lg-5 {
         border-top: 2px solid black;
         border-right: 2px solid black;
-        /* sin borde izquierdo ni inferior */
     }
 
 
@@ -893,11 +900,6 @@
 
     .bg-light-blue {
         background-color: #ADD8E6 !important;
-    }
-
-    .btn-clear {
-        background-color: #00e1a1;
-        color: white;
     }
 
     .form-section {
@@ -944,6 +946,30 @@
 
     .hidden-column {
         display: none;
+    }
+
+    .btn-hover-blue {
+        background-color: #001ba3;
+        color: #fff;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-hover-blue:hover,
+    .btn-hover-blue:focus {
+        background-color: #0033cc !important;
+        color: #fff !important;
+    }
+
+    .btn-hover-green {
+        background-color: #01cfa1;
+        color: #fff;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-hover-green:hover,
+    .btn-hover-green:focus {
+        background-color: #29ce81 !important;
+        color: #fff !important;
     }
 </style>
 

@@ -48,6 +48,11 @@
             cursor: pointer;
             z-index: 1061;
         }
+        .btn-primary{
+            border: none !important;
+            color: #000000 !important;
+            background-color: #ffffff !important;
+        }
         @media (max-width: 991.98px) {
             .sidebar {
                 border-radius: 0;
@@ -57,13 +62,14 @@
 </head>
 <body>
     <!-- Botón Toggle (solo visible cuando sidebar está oculto) -->
-    <button class="btn btn-primary position-absolute mt-3 ms-3" id="sidebarToggle" type="button"
+    <button class="btn btn-primary position-absolute mt-2 ms-3" id="sidebarToggle" type="button"
         style="z-index: 1060; display: block;" aria-label="Mostrar menú">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list"
-            viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="24" viewBox="0 0 40 24" fill="none">
+            <line x1="4" y1="5" x2="36" y2="5" stroke="black" stroke-width="4" stroke-linecap="round"/>
+            <line x1="4" y1="12" x2="36" y2="12" stroke="black" stroke-width="4" stroke-linecap="round"/>
+            <line x1="4" y1="19" x2="36" y2="19" stroke="black" stroke-width="4" stroke-linecap="round"/>
         </svg>
+        <span class="d-block">MENU</span>
     </button>
 
     <!-- Sidebar -->
