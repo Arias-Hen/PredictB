@@ -191,8 +191,7 @@ def informes(request):
         print(f"Error al leer el archivo CSV: {e}")
         options_json = '[]'
 
-    # obtener valoraciones desde la base de datos como en 'ventas'
-    valoraciones_qs = Valoracion.objects.filter(iduser=user_id, modo='informe')
+    valoraciones_qs = Valoracion.objects.filter(iduser=user_id)
     valoraciones = [{
         'modo': val.modo,
         'ciudad': val.ciudad,

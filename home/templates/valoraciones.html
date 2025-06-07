@@ -644,8 +644,8 @@
                 document
                   .getElementById("precio-esperado-unico")
                   .textContent.replace(/[^0-9.-]+/g, "")
-              ) || 0 // Si es NaN o vacío, usa 0
-            : 0; // Si el elemento no existe, también usa 0            console.log("PRECIO", precio_esperado_unico)
+              ) || 0
+            : 0; 
 
           const responseData = await prediccionResponse.json();
           console.log("Datos recibidos de la API:", responseData);

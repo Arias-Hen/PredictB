@@ -36,7 +36,8 @@
                 <div class="col-12 bg-blue p-2">
                     <div class="row ms-1">
                         <div class="col-md-4">
-                            <input type="text" class="form-control" placeholder="BUSQUE POR DIRECCIÓN">
+                            <input type="text" id="buscar-calle" class="form-control"
+                                placeholder="BUSQUE POR DIRECCIÓN">
                         </div>
                     </div>
                 </div>
@@ -82,18 +83,29 @@
                         </div>
                         <div class="col-6 col-md-3 col-lg-2">
                             <label class="form-label mb-1">Precio Desde:</label>
-                            <select class="form-select form-select-sm">
-                                <option>200.000</option>
+                            <select id="precio-desde" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="200000">200.000</option>
+                                <option value="400000">400.000</option>
+                                <option value="600000">600.000</option>
                             </select>
                         </div>
                         <div class="col-6 col-md-3 col-lg-2">
                             <label class="form-label mb-1">Precio Hasta:</label>
-                            <select class="form-select form-select-sm">
-                                <option>3.000.000</option>
+                            <select id="precio-hasta" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="1000000">1.000.000</option>
+                                <option value="2000000">2.000.000</option>
+                                <option value="3000000">3.000.000</option>
                             </select>
                         </div>
+
                         <div class="col-12 col-md-2 col-lg-1">
-                            <button type="button" class="btn btn btn-hover-green me-2 btn-sm w-100 mt-2">LIMPIAR FILTROS</button>
+                            <button type="button" id="limpiar-filtros"
+                                class="btn btn btn-hover-green me-2 btn-sm w-100 mt-2">
+                                LIMPIAR FILTROS
+                            </button>
+
                         </div>
                     </form>
                 </div>
@@ -252,7 +264,14 @@
                                     <td>{{ valoracion.distrito }}</td>
                                     <td>{{ valoracion.barrio }}</td>
                                     <td>{{ valoracion.calle }}</td>
-                                    <td></td>
+                                    <td>
+                                        {% if valoracion.precio_esperado_unico %}
+                                        {{ valoracion.precio_esperado_unico }}
+                                        {% else %}
+                                        {{ valoracion.precio_esperado }}
+                                        {% endif %}
+                                    </td>
+
                                     <!-- columnas ocultas -->
                                     <td class="hidden-column">{{ valoracion.planta }}</td>
                                     <td class="hidden-column">{{ valoracion.tipo_vivienda }}</td>
@@ -298,13 +317,15 @@
         const dd = String(hoy.getDate()).padStart(2, '0');
 
         const fechaHoy = `${yyyy}-${mm}-${dd}`;
+        const fechaEnero = `${yyyy}-01-01`;
 
         const desdeInput = document.getElementById('desde');
         const hastaInput = document.getElementById('hasta');
 
-        if (desdeInput && !desdeInput.value) desdeInput.value = fechaHoy;
+        if (desdeInput && !desdeInput.value) desdeInput.value = fechaEnero;
         if (hastaInput && !hastaInput.value) hastaInput.value = fechaHoy;
     });
+
 
     const optionsJson = '{{ options_json|escapejs }}';
     const ciudadSe = JSON.parse('{{ context_json|escapejs }}');
@@ -326,26 +347,35 @@
 
         const selectCiudad = document.getElementById('ciudad_' + sufijo);
 
+        selectCiudad.innerHTML = '';
+        if (sufijo == 1) {
+            const optionTodos = document.createElement('option');
+            optionTodos.value = '';
+            optionTodos.textContent = 'Todos';
+            optionTodos.selected = true;
+            selectCiudad.appendChild(optionTodos);
+        }
         options.forEach(option => {
             const optionElement = document.createElement('option');
             optionElement.value = option.id;
             optionElement.textContent = option.name;
             selectCiudad.appendChild(optionElement);
         });
-
-        const ciudad = ciudadSe.ciudad; // mismo comportamiento que antes
-        if (ciudad) {
-            const optionToSelect = Array.from(selectCiudad.options).find(option => option.value === ciudad);
-            if (optionToSelect) {
-                optionToSelect.selected = true;
-                selectCiudad.dispatchEvent(new Event('change'));
+        if (sufijo != 1) {
+            const ciudad = ciudadSe.ciudad;
+            if (ciudad) {
+                const optionToSelect = Array.from(selectCiudad.options).find(option => option.value === ciudad);
+                if (optionToSelect) {
+                    optionToSelect.selected = true;
+                    selectCiudad.dispatchEvent(new Event('change'));
+                }
             }
         }
         if (sufijo == 1) {
             filtrarTodo();
         }
-
     }
+
     function cargarDistritos(sufijo) {
         const ciudadSelect = document.getElementById('ciudad_' + sufijo);
         const distritoSelect = document.getElementById('distrito_' + sufijo);
@@ -365,9 +395,15 @@
                 if (!distritoSelect) return;
 
                 distritoSelect.innerHTML = '';
-                const defaultOption = document.createElement('option');
-                defaultOption.textContent = "Todos";
-                distritoSelect.appendChild(defaultOption);
+
+                // SOLO para sufijo 1
+                if (sufijo == 1) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = "Todos";
+                    defaultOption.selected = true;  // por defecto en "Todos"
+                    distritoSelect.appendChild(defaultOption);
+                }
 
                 data.distritos.forEach(distrito => {
                     const option = document.createElement('option');
@@ -376,18 +412,22 @@
                     distritoSelect.appendChild(option);
                 });
 
-                const distritoSe = JSON.parse('{{ context_json|escapejs }}');
-                const distrito = distritoSe.distrito;
-                console.log("distrito:", distrito);
-                if (distrito) {
-                    const seleccion = Array.from(distritoSelect.options).find(option => option.value === distrito);
-                    if (seleccion) {
-                        seleccion.selected = true;
-                        distritoSelect.dispatchEvent(new Event('change'));
+                // Solo seleccionar distrito si sufijo != 1
+                if (sufijo != 1) {
+                    const distritoSe = JSON.parse('{{ context_json|escapejs }}');
+                    const distrito = distritoSe.distrito;
+                    console.log("distrito:", distrito);
+                    if (distrito) {
+                        const seleccion = Array.from(distritoSelect.options).find(option => option.value === distrito);
+                        if (seleccion) {
+                            seleccion.selected = true;
+                            distritoSelect.dispatchEvent(new Event('change'));
+                        }
                     }
                 }
             })
             .catch(error => console.error('Error al cargar los distritos:', error));
+
         if (sufijo == 1) {
             filtrarTodo();
         }
@@ -414,9 +454,14 @@
                 if (!barrioSelect) return;
                 barrioSelect.innerHTML = '';
 
-                const defaultOption = document.createElement('option');
-                defaultOption.textContent = "Todos";
-                barrioSelect.appendChild(defaultOption);
+                // SOLO para sufijo 1
+                if (sufijo == 1) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = "Todos";
+                    defaultOption.selected = true;  // por defecto en "Todos"
+                    barrioSelect.appendChild(defaultOption);
+                }
 
                 data.barrio.forEach(barrio => {
                     const option = document.createElement('option');
@@ -425,21 +470,26 @@
                     barrioSelect.appendChild(option);
                 });
 
-                const barrioSe = JSON.parse('{{ context_json|escapejs }}');
-                const barrio = barrioSe.barrio;
-                if (barrio) {
-                    const seleccion = Array.from(barrioSelect.options).find(option => option.value === barrio);
-                    if (seleccion) {
-                        seleccion.selected = true;
-                        barrioSelect.dispatchEvent(new Event('change'));
+                // Solo seleccionar barrio si sufijo != 1
+                if (sufijo != 1) {
+                    const barrioSe = JSON.parse('{{ context_json|escapejs }}');
+                    const barrio = barrioSe.barrio;
+                    if (barrio) {
+                        const seleccion = Array.from(barrioSelect.options).find(option => option.value === barrio);
+                        if (seleccion) {
+                            seleccion.selected = true;
+                            barrioSelect.dispatchEvent(new Event('change'));
+                        }
                     }
                 }
             })
             .catch(error => console.error('Error al cargar los barrios:', error));
+
         if (sufijo == 1) {
             filtrarTodo();
         }
     }
+
     function cargarCalle(sufijo) {
         const barrioSelect = document.getElementById('barrio_' + sufijo);
         const calleSelect = document.getElementById('calle_' + sufijo);
@@ -462,9 +512,14 @@
                 if (!calleSelect) return;
                 calleSelect.innerHTML = '';
 
-                const defaultOption = document.createElement('option');
-                defaultOption.textContent = "Todos";
-                calleSelect.appendChild(defaultOption);
+                // SOLO para sufijo 1
+                if (sufijo == 1) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = "Todos";
+                    defaultOption.selected = true;  // por defecto en "Todos"
+                    calleSelect.appendChild(defaultOption);
+                }
 
                 data.calle.forEach(calle => {
                     const option = document.createElement('option');
@@ -473,17 +528,21 @@
                     calleSelect.appendChild(option);
                 });
 
-                const calleSe = JSON.parse('{{ context_json|escapejs }}');
-                const calle = calleSe.calle;
-                if (calle) {
-                    const seleccion = Array.from(calleSelect.options).find(option => option.value === calle);
-                    if (seleccion) {
-                        seleccion.selected = true;
-                        calleSelect.dispatchEvent(new Event('change'));
+                // Solo seleccionar calle si sufijo != 1
+                if (sufijo != 1) {
+                    const calleSe = JSON.parse('{{ context_json|escapejs }}');
+                    const calle = calleSe.calle;
+                    if (calle) {
+                        const seleccion = Array.from(calleSelect.options).find(option => option.value === calle);
+                        if (seleccion) {
+                            seleccion.selected = true;
+                            calleSelect.dispatchEvent(new Event('change'));
+                        }
                     }
                 }
             })
             .catch(error => console.error('Error al cargar las calles:', error));
+
         if (sufijo == 1) {
             filtrarTodo();
         }
@@ -781,10 +840,6 @@
         }
     }
 
-
-
-
-
     document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
         elem.addEventListener('change', filtrarTodo);
     });
@@ -812,7 +867,57 @@
     document.getElementById('desde').addEventListener('change', filtrarTodo);
     document.getElementById('hasta').addEventListener('change', filtrarTodo);
 
+    document.getElementById('buscar-calle').addEventListener('input', function () {
+        const filtro = this.value.toLowerCase();
+        const filas = document.querySelectorAll('#valoraciones-table tbody tr');
 
+        filas.forEach(fila => {
+            const calle = fila.children[7].textContent.toLowerCase();
+
+            if (calle.includes(filtro)) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    });
+    function filtrarPorPrecio() {
+        const precioDesde = parseFloat(document.getElementById('precio-desde').value) || 0;
+        const precioHasta = parseFloat(document.getElementById('precio-hasta').value) || Infinity;
+
+        const filas = document.querySelectorAll('#valoraciones-table tbody tr');
+
+        filas.forEach(fila => {
+            const textoPrecio = fila.children[8].textContent.trim().replace(/\./g, '').replace(',', '.');
+            const precio = parseFloat(textoPrecio) || 0;
+
+            if (precio >= precioDesde && precio <= precioHasta) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    }
+
+    // Activar filtro cuando cambie el select
+    document.getElementById('precio-desde').addEventListener('change', filtrarPorPrecio);
+    document.getElementById('precio-hasta').addEventListener('change', filtrarPorPrecio);
+
+
+    document.getElementById('limpiar-filtros').addEventListener('click', function () {
+        document.getElementById('buscar-calle').value = '';
+        document.getElementById('desde').value = '';
+        document.getElementById('hasta').value = '';
+        document.getElementById('ciudad_1').selectedIndex = 0;
+        document.getElementById('distrito_1').selectedIndex = 0;
+        document.getElementById('barrio_1').selectedIndex = 0;
+        document.getElementById('calle_1').selectedIndex = 0;
+        document.querySelectorAll('.filter-section select').forEach(select => {
+            select.selectedIndex = 0;
+        });
+        const filas = document.querySelectorAll('#valoraciones-table tbody tr');
+        filas.forEach(fila => fila.style.display = '');
+    });
 
     document.getElementById('registrarinf').addEventListener('click', async function () {
         const iduser = "{{user_id}}";
