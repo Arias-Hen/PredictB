@@ -18,6 +18,7 @@ urlpatterns = [
     path('get_barrios/<str:distrito>/', views.get_barrios, name='get_barrios'),
     path('get_calles/<str:barrios>/', views.get_calles, name='get_calles'),
     path('guardar_valoracion/', views.guardar_valoracion, name='get_guardar_valoracion'),
+    path('modificar_valoracion/', views.modificar_valoracion, name='get_modificar_valoracion'),
     path('login/', views.user_login, name='login'),
     path('register/', views.user_register, name='register'),
     path('exportar_excel/', views.exportar_excel, name='exportar_excel'),

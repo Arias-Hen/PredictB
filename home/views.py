@@ -1,3 +1,4 @@
+from django.forms import model_to_dict
 from django.shortcuts import render, redirect
 from .models import Users
 import csv
@@ -132,6 +133,7 @@ def ventas(request):
         valoraciones_qs = Valoracion.objects.filter(iduser=user_id)
         for val in valoraciones_qs:
             valoraciones.append({
+                'idv': val.idv,
                 'modo': val.modo,
                 'ciudad': val.ciudad,
                 'distrito': val.distrito,
@@ -154,7 +156,7 @@ def ventas(request):
             })
     except FileNotFoundError:
         print("Archivo de valoraciones no encontrado.")
-    return render(request, 'ventas.html', {'options_json': options_json, 'context_json': context_json, 'valoraciones':valoraciones, 'user_nombre': user_nombre})
+    return render(request, 'ventas.html', {'options_json': options_json, 'context_json': context_json, 'valoraciones':valoraciones, 'user_nombre': user_nombre, 'user_id': user_id})
 
 @csrf_exempt
 @login_required
@@ -327,6 +329,48 @@ def guardar_valoracion(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Datos inválidos"}, status=400)
 
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+@csrf_exempt
+def modificar_valoracion(request):
+    if request.method == 'POST':
+        try:
+            print("Raw data:", request.body)  # Depuración
+            data = json.loads(request.body)
+            print("Parsed data:", data)  # Depuración
+            
+            idv = data.get('idv')
+            if not idv:
+                return JsonResponse({"error": "ID requerido", "received_data": data}, status=400)
+            
+            try:
+                valoracion = Valoracion.objects.get(idv=idv)
+            except Valoracion.DoesNotExist:
+                return JsonResponse({"error": f"Valoración con ID {idv} no existe"}, status=404)
+            
+            # Campos a actualizar
+            campos = ['modo', 'ciudad', 'distrito', 'barrio', 'calle', 
+                     'tipo_vivienda', 'metros_cuadrados', 'num_habitaciones',
+                     'num_banos', 'planta', 'estado_inmueble']
+            
+            for campo in campos:
+                if campo in data:
+                    setattr(valoracion, campo, data[campo])
+            
+            # Campos booleanos
+            valoracion.terraza = data.get('terraza') == 'SI'
+            valoracion.balcon = data.get('balcon') == 'SI'
+            valoracion.ascensor = data.get('ascensor') == 'SI'
+            
+            valoracion.save()
+            
+            return JsonResponse({"success": True, "id": valoracion.idv})
+
+        except json.JSONDecodeError as e:
+            return JsonResponse({"error": "JSON inválido", "detail": str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 def user_login(request):
