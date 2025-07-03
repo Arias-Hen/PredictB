@@ -82,8 +82,11 @@
                         </div>
                         <div class="col-6 col-md-2 col-lg-1">
                             <label class="form-label mb-1">Tipo:</label>
-                            <select class="form-select form-select-sm">
-                                <option>Valoración</option>
+                            <select id="tipo_1" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="valoracion">valoracion</option>
+                                <option value="registro">registro</option>
+                                <option value="informe">informe</option>
                             </select>
                         </div>
                         <div class="col-6 col-md-3 col-lg-2">
@@ -834,23 +837,24 @@
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 
+    document.getElementById('tipo_1').addEventListener('change', filtrarTodo);
 
     function filtrarTodo() {
         console.log("filtrarTodo ejecutado");
 
         const desdeInput = document.getElementById('desde');
         const hastaInput = document.getElementById('hasta');
+        const tipoInput = document.getElementById('tipo_1');
+        const precioDesdeInput = document.getElementById('precio-desde');
+        const precioHastaInput = document.getElementById('precio-hasta');
 
-        let desdeStr = '';
-        let hastaStr = '';
+        let desdeStr = desdeInput?.value || '';
+        let hastaStr = hastaInput?.value || '';
+        let tipo = tipoInput?.value.toLowerCase() || '';
+        let precioDesde = parseFloat(precioDesdeInput?.value) || 0;
+        let precioHasta = parseFloat(precioHastaInput?.value) || Infinity;
 
-        if (desdeInput && desdeInput.value) {
-            desdeStr = desdeInput.value;
-        }
-
-        if (hastaInput && hastaInput.value) {
-            hastaStr = hastaInput.value;
-        }
+        if (tipo === 'todos' || tipo === 'seleccionar') tipo = '';
 
         let ciudad = document.getElementById('ciudad_1')?.value.toLowerCase() || '';
         let distrito = document.getElementById('distrito_1')?.value.toLowerCase() || '';
@@ -867,6 +871,7 @@
         for (let fila of filas) {
             let mostrar = true;
 
+            // Fecha
             const textoFecha = fila.cells[1].textContent.trim(); // dd/mm/yyyy
             const partes = textoFecha.split('/');
             let fechaFilaStr = '';
@@ -881,14 +886,24 @@
             if (desdeStr && fechaFilaStr < desdeStr) mostrar = false;
             if (hastaStr && fechaFilaStr > hastaStr) mostrar = false;
 
+            // Tipo
+            if (tipo && !fila.cells[3].textContent.toLowerCase().includes(tipo)) mostrar = false;
+
+            // Ciudad, distrito, barrio, calle
             if (ciudad && !fila.cells[4].textContent.toLowerCase().includes(ciudad)) mostrar = false;
             if (distrito && !fila.cells[5].textContent.toLowerCase().includes(distrito)) mostrar = false;
             if (barrio && !fila.cells[6].textContent.toLowerCase().includes(barrio)) mostrar = false;
             if (calle && !fila.cells[7].textContent.toLowerCase().includes(calle)) mostrar = false;
 
+            // Precio
+            const textoPrecio = fila.cells[8].textContent.trim().replace(/\./g, '').replace(',', '.');
+            const precio = parseFloat(textoPrecio) || 0;
+            if (precio < precioDesde || precio > precioHasta) mostrar = false;
+
             fila.style.display = mostrar ? '' : 'none';
         }
     }
+
 
     document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
         elem.addEventListener('change', filtrarTodo);
