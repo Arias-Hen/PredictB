@@ -1000,7 +1000,21 @@
         const balcon = parseInt(document.getElementById('tiene-balcon').value)
         const ascensor = parseInt(document.getElementById('tiene-ascensor').value)
         const estado = document.getElementById('estado-inmueble').value;
+        let precios = {
+            precio_minimo: 0,
+            precio_esperado: 0,
+            precio_maximo: 0,
+            precio_esperado_unico: 0
+        };
 
+        if (valoracionSeleccionada) {
+            precios = {
+                precio_minimo: parseFloat(valoracionSeleccionada.precio_minimo) || 0,
+                precio_esperado: parseFloat(valoracionSeleccionada.precio_esperado) || 0,
+                precio_maximo: parseFloat(valoracionSeleccionada.precio_maximo) || 0,
+                precio_esperado_unico: parseFloat(valoracionSeleccionada.precio_esperado_unico) || 0
+            };
+        }
         const data = {
             iduser,
             modo,
@@ -1017,10 +1031,10 @@
             balcon,
             ascensor,
             estado,
-            precio_minimo: 0,
-            precio_esperado: 0,
-            precio_maximo: 0,
-            precio_esperado_unico: 0,
+            precio_minimo: precios.precio_minimo,
+            precio_esperado: precios.precio_esperado,
+            precio_maximo: precios.precio_maximo,
+            precio_esperado_unico: precios.precio_esperado_unico,
 
         };
         console.log("DATOS REGISTRADOS" + JSON.stringify(data))
@@ -1039,6 +1053,7 @@
         }
 
         console.log('Valoración guardada correctamente.');
+        window.location.href = '/home/ventas';
     });
 
     document.getElementById('generarinf2').addEventListener('click', async function () {
@@ -1057,7 +1072,21 @@
         const balcon = parseInt(document.getElementById('tiene-balcon').value)
         const ascensor = parseInt(document.getElementById('tiene-ascensor').value)
         const estado = document.getElementById('estado-inmueble').value;
+        let precios = {
+            precio_minimo: 0,
+            precio_esperado: 0,
+            precio_maximo: 0,
+            precio_esperado_unico: 0
+        };
 
+        if (valoracionSeleccionada) {
+            precios = {
+                precio_minimo: parseFloat(valoracionSeleccionada.precio_minimo) || 0,
+                precio_esperado: parseFloat(valoracionSeleccionada.precio_esperado) || 0,
+                precio_maximo: parseFloat(valoracionSeleccionada.precio_maximo) || 0,
+                precio_esperado_unico: parseFloat(valoracionSeleccionada.precio_esperado_unico) || 0
+            };
+        }
         const data = {
             iduser,
             modo,
@@ -1074,10 +1103,10 @@
             balcon,
             ascensor,
             estado,
-            precio_minimo: 0,
-            precio_esperado: 0,
-            precio_maximo: 0,
-            precio_esperado_unico: 0,
+            precio_minimo: precios.precio_minimo,
+            precio_esperado: precios.precio_esperado,
+            precio_maximo: precios.precio_maximo,
+            precio_esperado_unico: precios.precio_esperado_unico,
         };
         console.log("DATOS REGISTRADOS" + JSON.stringify(data))
 
