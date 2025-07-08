@@ -74,8 +74,11 @@
                         </div>
                         <div class="col-6 col-md-2 col-lg-1">
                             <label class="form-label mb-1">Tipo:</label>
-                            <select class="form-select form-select-sm">
-                                <option>Valoración</option>
+                            <select id="tipo_1" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="valoracion">valoracion</option>
+                                <option value="registro">registro</option>
+                                <option value="informe">informe</option>
                             </select>
                         </div>
                         <div class="col-6 col-md-3 col-lg-2">
@@ -118,7 +121,11 @@
                                     <td>{{ valoracion.modo }}</td>
                                     <td>
                                         {% if valoracion.precio_esperado_unico %}
+                                        {% if valoracion.precio_esperado_unico != 0 %}
                                         {{ valoracion.precio_esperado_unico }}
+                                        {% else %}
+                                        {{ valoracion.precio_esperado }}
+                                        {% endif %}
                                         {% else %}
                                         {{ valoracion.precio_esperado }}
                                         {% endif %}
@@ -170,6 +177,8 @@
 
 </body>
 <script>
+    document.getElementById('tipo_1').addEventListener('change', filtrarTodo);
+
     document.getElementById('desde').addEventListener('change', filtrarTodo);
     document.getElementById('hasta').addEventListener('change', filtrarTodo);
     window.addEventListener('DOMContentLoaded', () => {
@@ -460,17 +469,17 @@
 
         const desdeInput = document.getElementById('desde');
         const hastaInput = document.getElementById('hasta');
+        const tipoInput = document.getElementById('tipo_1');
+        const precioDesdeInput = document.getElementById('precio-desde');
+        const precioHastaInput = document.getElementById('precio-hasta');
 
-        let desdeStr = '';
-        let hastaStr = '';
+        let desdeStr = desdeInput?.value || '';
+        let hastaStr = hastaInput?.value || '';
+        let tipo = tipoInput?.value.toLowerCase() || '';
+        let precioDesde = parseFloat(precioDesdeInput?.value) || 0;
+        let precioHasta = parseFloat(precioHastaInput?.value) || Infinity;
 
-        if (desdeInput && desdeInput.value) {
-            desdeStr = desdeInput.value;
-        }
-
-        if (hastaInput && hastaInput.value) {
-            hastaStr = hastaInput.value;
-        }
+        if (tipo === 'todos' || tipo === 'seleccionar') tipo = '';
 
         let ciudad = document.getElementById('ciudad_1')?.value.toLowerCase() || '';
         let distrito = document.getElementById('distrito_1')?.value.toLowerCase() || '';
@@ -481,18 +490,14 @@
         if (barrio === 'todos' || barrio === 'seleccionar') barrio = '';
         if (calle === 'todos' || calle === 'seleccionar') calle = '';
 
-        // Normaliza quitando "calle " si está al inicio en filtro calle
-        if (calle.startsWith('calle ')) {
-            calle = calle.substring(6);
-        }
-
         const tabla = document.getElementById('valoraciones-table');
         const filas = tabla.tBodies[0].rows;
 
         for (let fila of filas) {
             let mostrar = true;
 
-            const textoFecha = fila.cells[1].textContent.trim(); // dd/mm/yyyy
+            // Fecha
+            const textoFecha = fila.cells[1].textContent.trim();
             const partes = textoFecha.split('/');
             let fechaFilaStr = '';
 
@@ -500,30 +505,23 @@
                 const dia = partes[0].padStart(2, '0');
                 const mes = partes[1].padStart(2, '0');
                 const anio = partes[2];
-                fechaFilaStr = `${anio}-${mes}-${dia}`; // yyyy-mm-dd
+                fechaFilaStr = `${anio}-${mes}-${dia}`;
             }
 
             if (desdeStr && fechaFilaStr < desdeStr) mostrar = false;
             if (hastaStr && fechaFilaStr > hastaStr) mostrar = false;
 
-            // Ubicación completa (calle, barrio, distrito, ciudad)
-            const ubicacion = fila.cells[4].textContent.toLowerCase();
-            const partesUbicacion = ubicacion.split(',').map(s => s.trim());
+            if (tipo && !fila.cells[2].textContent.toLowerCase().includes(tipo)) mostrar = false;
 
-            let calleFila = partesUbicacion[0] || '';
-            let barrioFila = partesUbicacion[1] || '';
-            let distritoFila = partesUbicacion[2] || '';
-            let ciudadFila = partesUbicacion[3] || '';
+            if (ciudad && !fila.cells[4].textContent.toLowerCase().includes(ciudad)) mostrar = false;
 
-            // Normaliza quitando "calle " al inicio en la fila también
-            if (calleFila.startsWith('calle ')) {
-                calleFila = calleFila.substring(6);
-            }
+            if (distrito && !fila.cells[6].textContent.toLowerCase().includes(distrito)) mostrar = false;
+            if (barrio && !fila.cells[7].textContent.toLowerCase().includes(barrio)) mostrar = false;
+            if (calle && !fila.cells[8].textContent.toLowerCase().includes(calle)) mostrar = false;
 
-            if (calle && !calleFila.includes(calle)) mostrar = false;
-            if (barrio && !barrioFila.includes(barrio)) mostrar = false;
-            if (distrito && !distritoFila.includes(distrito)) mostrar = false;
-            if (ciudad && !ciudadFila.includes(ciudad)) mostrar = false;
+            const textoPrecio = fila.cells[3].textContent.trim().replace(/\./g, '').replace(',', '.');
+            const precio = parseFloat(textoPrecio) || 0;
+            if (precio < precioDesde || precio > precioHasta) mostrar = false;
 
             fila.style.display = mostrar ? '' : 'none';
         }

@@ -232,7 +232,7 @@
                                     <div class="col-6">
                                         <div class="text-center">
                                             <button type="button" class="btn fw-bold w-100 py-2 btn-hover-blue"
-                                                id="generarinf2" onclick="window.location.href='/home/generarinf'">
+                                                id="generarinf2">
                                                 GENERAR INFORME
                                             </button>
                                         </div>
@@ -773,9 +773,9 @@
                         balcon: row.querySelector('td:nth-child(18)').textContent.trim() === 'True' ? 'SI' : 'NO',
                         ascensor: row.querySelector('td:nth-child(19)').textContent.trim() === 'True' ? 'SI' : 'NO',
                         precio_minimo: row.querySelector('td:nth-child(20)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(20)').textContent.trim(),
-                        precio_esperado: row.querySelector('td:nth-child(21)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(21)').textContent.trim(),
-                        precio_maximo: row.querySelector('td:nth-child(22)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(22)').textContent.trim(),
-                        precio_esperado_unico: row.querySelector('td:nth-child(23)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(23)').textContent.trim(),
+                        precio_esperado: row.querySelector('td:nth-child(9)').textContent.trim(),
+                        precio_maximo: row.querySelector('td:nth-child(22)').textContent.trim(),
+                        precio_esperado_unico: row.querySelector('td:nth-child(10)').textContent.trim(),
                         idv: row.querySelector('td:nth-child(24)').textContent.trim(),
 
                     };
@@ -985,7 +985,6 @@
     });
 
     document.getElementById('registrarinf').addEventListener('click', async function () {
-        const idv = valoracionSeleccionada ? parseInt(valoracionSeleccionada.idv, 10) : null;
         const iduser = "{{user_id}}";
         const modo = "registro";
         const ciudad = document.getElementById('ciudad_2').value;
@@ -1003,7 +1002,6 @@
         const estado = document.getElementById('estado-inmueble').value;
 
         const data = {
-            idv: parseInt(idv),
             iduser,
             modo,
             ciudad,
@@ -1027,7 +1025,7 @@
         };
         console.log("DATOS REGISTRADOS" + JSON.stringify(data))
 
-        const guardarResponse = await fetch('/home/modificar_valoracion/', {
+        const guardarResponse = await fetch('/home/guardar_valoracion/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1041,6 +1039,69 @@
         }
 
         console.log('Valoración guardada correctamente.');
+    });
+
+    document.getElementById('generarinf2').addEventListener('click', async function () {
+        const iduser = "{{user_id}}";
+        const modo = "informe";
+        const ciudad = document.getElementById('ciudad_2').value;
+        const distrito = document.getElementById('distrito_2').value;
+        const barrio = document.getElementById('barrio_2').value;
+        const calle = document.getElementById('calle_2').value;
+        const tipo_vivienda = parseInt(document.getElementById('tipo-vivienda').value, 10);
+        const m2 = parseInt(document.getElementById('metros-cuadrados').value, 10);
+        const num_habitaciones = parseInt(document.getElementById('num-habitaciones').value, 10);
+        const num_banos = parseInt(document.getElementById('num-banos').value, 10);
+        const planta = document.getElementById('planta').value;
+        const terraza = parseInt(document.getElementById('tiene-terraza').value)
+        const balcon = parseInt(document.getElementById('tiene-balcon').value)
+        const ascensor = parseInt(document.getElementById('tiene-ascensor').value)
+        const estado = document.getElementById('estado-inmueble').value;
+
+        const data = {
+            iduser,
+            modo,
+            ciudad,
+            distrito,
+            barrio,
+            calle,
+            tipo_vivienda,
+            m2,
+            num_habitaciones,
+            num_banos,
+            planta,
+            terraza,
+            balcon,
+            ascensor,
+            estado,
+            precio_minimo: 0,
+            precio_esperado: 0,
+            precio_maximo: 0,
+            precio_esperado_unico: 0,
+        };
+        console.log("DATOS REGISTRADOS" + JSON.stringify(data))
+
+        try {
+            const guardarResponse = await fetch('/home/guardar_valoracion/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!guardarResponse.ok) {
+                throw new Error(`Error al guardar la valoración. Status: ${guardarResponse.status}`);
+            }
+
+            console.log('Valoración guardada correctamente.');
+
+            window.location.href = '/home/informes';
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
     });
     document.addEventListener('click', function (event) {
         if (event.target && event.target.classList.contains('select-all')) {
