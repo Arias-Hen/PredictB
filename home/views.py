@@ -25,6 +25,13 @@ from django.contrib.auth import get_user_model
 from .models import Valoracion
 from urllib.parse import unquote
 from .models import PredictionModel
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Vivienda, ImagenVivienda
+from .utils import generar_pdf
+import requests
+from openai import OpenAI
 
 def home(request):
     return render(request, 'home.html')
@@ -511,3 +518,56 @@ def get_radar_data(request):
     
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
+OPENAI_API_KEY = "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"  # ← pon aquí tu clave real
+
+def formulario_vivienda(request):
+    return render(request, 'crear_vivienda.html')
+
+@csrf_exempt
+def crear_vivienda_api(request):
+    if request.method == 'POST':
+        print("📩 Recibido POST en /api/vivienda/")
+        m2 = request.POST.get("metros_cuadrados")
+        hab = request.POST.get("habitaciones")
+        banos = request.POST.get("banos")
+        ascensor = request.POST.get("ascensor") == "true"
+
+        descripcion = generar_descripcion_vivienda(m2, hab, banos, ascensor)
+
+        vivienda = Vivienda.objects.create(
+            metros_cuadrados=m2,
+            habitaciones=hab,
+            banos=banos,
+            ascensor=ascensor,
+            descripcion=descripcion
+        )
+
+        for file in request.FILES.getlist("imagenes[]"):
+            ImagenVivienda.objects.create(vivienda=vivienda, imagen=file)
+
+        imagenes = [img.imagen.path for img in vivienda.imagenes.all()]
+        ruta_pdf = generar_pdf(vivienda, imagenes)
+
+        return JsonResponse({
+            "ok": True,
+            "mensaje": "Reporte generado",
+            "descripcion": descripcion,
+            "pdf_url": ruta_pdf
+        })
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+def generar_descripcion_vivienda(m2, hab, banos, ascensor):
+    client = OpenAI(
+        api_key=OPENAI_API_KEY
+    )
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Eres un experto en ventas inmobiliarias."},
+            {"role": "user", "content": f"Genera una descripción atractiva para un anuncio de vivienda con {m2}m2, {hab} habitaciones, {banos} baños y {'con' if ascensor else 'sin'} ascensor."}
+        ],
+        stream=False
+    )
+    return response.choices[0].message.content

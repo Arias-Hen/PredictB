@@ -13,6 +13,9 @@
     {% extends 'sidebar.html' %}
     {% load static %}
     {% block content %}
+</head>
+
+<body>
 
     <div class="container-fluid p-0 m-0">
         <!-- Título (azul completo) -->
@@ -147,7 +150,7 @@
                         </table>
                     </div>
                     <div class="table-container text-center mt-3">
-                        <button class="export-to-excel btn btn-danger mb-2 btn-spacing">
+                        <button class="export-to-excel btn btn-danger mb-2 btn-spacing" onclick="exportToPDF()">
                             EXPORTAR A PDF
                         </button>
                         <button class="open-record btn btn-primary mb-2 btn-spacing"
@@ -159,701 +162,646 @@
                                     d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
                             </svg>
                         </button>
-                        <button class="open-record btn btn-primary mb-2"
-                            style="background-color: #001ba3 !important; color: #fff !important;">
-                            Seleccionar Todo
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('desde').addEventListener('change', filtrarTodo);
-        document.getElementById('hasta').addEventListener('change', filtrarTodo);
-        window.addEventListener('DOMContentLoaded', () => {
-            const hoy = new Date();
-            const yyyy = hoy.getFullYear();
-            const mm = String(hoy.getMonth() + 1).padStart(2, '0');
-            const dd = String(hoy.getDate()).padStart(2, '0');
+</body>
+<script>
+    document.getElementById('desde').addEventListener('change', filtrarTodo);
+    document.getElementById('hasta').addEventListener('change', filtrarTodo);
+    window.addEventListener('DOMContentLoaded', () => {
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoy.getDate()).padStart(2, '0');
 
-            const fechaHoy = `${yyyy}-${mm}-${dd}`;
-            const fechaEnero = `${yyyy}-01-01`;
+        const fechaHoy = `${yyyy}-${mm}-${dd}`;
+        const fechaEnero = `${yyyy}-01-01`;
 
-            const desdeInput = document.getElementById('desde');
-            const hastaInput = document.getElementById('hasta');
+        const desdeInput = document.getElementById('desde');
+        const hastaInput = document.getElementById('hasta');
 
-            if (desdeInput && !desdeInput.value) desdeInput.value = fechaEnero;
-            if (hastaInput && !hastaInput.value) hastaInput.value = fechaHoy;
-        });
+        if (desdeInput && !desdeInput.value) desdeInput.value = fechaEnero;
+        if (hastaInput && !hastaInput.value) hastaInput.value = fechaHoy;
+    });
 
-        const optionsJson = '{{ options_json|escapejs }}';
-        const ciudadSe = JSON.parse('{{ context_json|escapejs }}');
+    const optionsJson = '{{ options_json|escapejs }}';
+    const ciudadSe = JSON.parse('{{ context_json|escapejs }}');
 
+    if (optionsJson.trim() === "") {
+        console.error("La variable options_json está vacía.");
+    } else {
+        const selectCiudad = document.getElementById('ciudad');
+        cargarCiudades('1')
+        cargarCiudades('2')
+    }
+    function cargarCiudades(sufijo) {
         if (optionsJson.trim() === "") {
             console.error("La variable options_json está vacía.");
-        } else {
-            const selectCiudad = document.getElementById('ciudad');
-            cargarCiudades('1')
-            cargarCiudades('2')
+            return;
         }
-        function cargarCiudades(sufijo) {
-            if (optionsJson.trim() === "") {
-                console.error("La variable options_json está vacía.");
-                return;
-            }
 
-            const options = JSON.parse(optionsJson);
+        const options = JSON.parse(optionsJson);
 
-            const selectCiudad = document.getElementById('ciudad_' + sufijo);
+        const selectCiudad = document.getElementById('ciudad_' + sufijo);
 
-            selectCiudad.innerHTML = '';
-            if (sufijo == 1) {
-                const optionTodos = document.createElement('option');
-                optionTodos.value = '';
-                optionTodos.textContent = 'Todos';
-                optionTodos.selected = true;
-                selectCiudad.appendChild(optionTodos);
-            }
-            options.forEach(option => {
-                const optionElement = document.createElement('option');
-                optionElement.value = option.id;
-                optionElement.textContent = option.name;
-                selectCiudad.appendChild(optionElement);
-            });
-            if (sufijo != 1) {
-                const ciudad = ciudadSe.ciudad;
-                if (ciudad) {
-                    const optionToSelect = Array.from(selectCiudad.options).find(option => option.value === ciudad);
-                    if (optionToSelect) {
-                        optionToSelect.selected = true;
-                        selectCiudad.dispatchEvent(new Event('change'));
-                    }
+        selectCiudad.innerHTML = '';
+        if (sufijo == 1) {
+            const optionTodos = document.createElement('option');
+            optionTodos.value = '';
+            optionTodos.textContent = 'Todos';
+            optionTodos.selected = true;
+            selectCiudad.appendChild(optionTodos);
+        }
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.id;
+            optionElement.textContent = option.name;
+            selectCiudad.appendChild(optionElement);
+        });
+        if (sufijo != 1) {
+            const ciudad = ciudadSe.ciudad;
+            if (ciudad) {
+                const optionToSelect = Array.from(selectCiudad.options).find(option => option.value === ciudad);
+                if (optionToSelect) {
+                    optionToSelect.selected = true;
+                    selectCiudad.dispatchEvent(new Event('change'));
                 }
             }
-            if (sufijo == 1) {
-                filtrarTodo();
-            }
+        }
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+    }
+
+    function cargarDistritos(sufijo) {
+        const ciudadSelect = document.getElementById('ciudad_' + sufijo);
+        const distritoSelect = document.getElementById('distrito_' + sufijo);
+
+        const ciudadSeleccionada = ciudadSelect?.value;
+        if (!ciudadSeleccionada) {
+            if (distritoSelect) distritoSelect.innerHTML = '';
+            console.log("a");
+            return;
         }
 
-        function cargarDistritos(sufijo) {
-            const ciudadSelect = document.getElementById('ciudad_' + sufijo);
-            const distritoSelect = document.getElementById('distrito_' + sufijo);
+        console.log(`URL de la solicitud: /home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`);
 
-            const ciudadSeleccionada = ciudadSelect?.value;
-            if (!ciudadSeleccionada) {
-                if (distritoSelect) distritoSelect.innerHTML = '';
-                console.log("a");
-                return;
-            }
+        fetch(`/home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!distritoSelect) return;
 
-            console.log(`URL de la solicitud: /home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`);
+                distritoSelect.innerHTML = '';
 
-            fetch(`/home/get_distritos/${encodeURIComponent(ciudadSeleccionada)}/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (!distritoSelect) return;
-
-                    distritoSelect.innerHTML = '';
-
-                    if (sufijo == 1) {
-                        const defaultOption = document.createElement('option');
-                        defaultOption.value = '';
-                        defaultOption.textContent = "Todos";
-                        defaultOption.selected = true;
-                        distritoSelect.appendChild(defaultOption);
-                    }
-
-                    data.distritos.forEach(distrito => {
-                        const option = document.createElement('option');
-                        option.value = distrito.id;
-                        option.textContent = distrito.name;
-                        distritoSelect.appendChild(option);
-                    });
-
-                    if (sufijo != 1) {
-                        const distritoSe = JSON.parse('{{ context_json|escapejs }}');
-                        const distrito = distritoSe.distrito;
-                        console.log("distrito:", distrito);
-                        if (distrito) {
-                            const seleccion = Array.from(distritoSelect.options).find(option => option.value === distrito);
-                            if (seleccion) {
-                                seleccion.selected = true;
-                                distritoSelect.dispatchEvent(new Event('change'));
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error('Error al cargar los distritos:', error));
-
-            if (sufijo == 1) {
-                filtrarTodo();
-            }
-        }
-        function cargarBarrios(sufijo) {
-            const distritoSelect = document.getElementById('distrito_' + sufijo);
-            const barrioSelect = document.getElementById('barrio_' + sufijo);
-
-            const distritoSeleccionado = distritoSelect?.value;
-
-            if (!distritoSeleccionado) {
-                console.log("No se seleccionó ningún distrito.");
-                if (barrioSelect) barrioSelect.innerHTML = '';
-                return;
-            }
-
-            console.log(`URL de la solicitud: /home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`);
-
-            fetch(`/home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Datos recibidos del servidor:', data);
-
-                    if (!barrioSelect) return;
-                    barrioSelect.innerHTML = '';
-                    if (sufijo == 1) {
-                        const defaultOption = document.createElement('option');
-                        defaultOption.value = '';
-                        defaultOption.textContent = "Todos";
-                        defaultOption.selected = true;
-                        barrioSelect.appendChild(defaultOption);
-                    }
-
-                    data.barrio.forEach(barrio => {
-                        const option = document.createElement('option');
-                        option.value = barrio.id;
-                        option.textContent = barrio.name;
-                        barrioSelect.appendChild(option);
-                    });
-
-                    if (sufijo != 1) {
-                        const barrioSe = JSON.parse('{{ context_json|escapejs }}');
-                        const barrio = barrioSe.barrio;
-                        if (barrio) {
-                            const seleccion = Array.from(barrioSelect.options).find(option => option.value === barrio);
-                            if (seleccion) {
-                                seleccion.selected = true;
-                                barrioSelect.dispatchEvent(new Event('change'));
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error('Error al cargar los barrios:', error));
-
-            if (sufijo == 1) {
-                filtrarTodo();
-            }
-        }
-
-        function cargarCalle(sufijo) {
-            const barrioSelect = document.getElementById('barrio_' + sufijo);
-            const calleSelect = document.getElementById('calle_' + sufijo);
-
-            const barrioSeleccionado = barrioSelect?.value;
-
-            if (!barrioSeleccionado) {
-                console.log("No se seleccionó ningún barrio.");
-                if (calleSelect) calleSelect.innerHTML = '';
-                return;
-            }
-
-            console.log(`URL de la solicitud: /home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`);
-
-            fetch(`/home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Datos recibidos del servidor:', data);
-
-                    if (!calleSelect) return;
-                    calleSelect.innerHTML = '';
-
-                    if (sufijo == 1) {
-                        const defaultOption = document.createElement('option');
-                        defaultOption.value = '';
-                        defaultOption.textContent = "Todos";
-                        defaultOption.selected = true;
-                        calleSelect.appendChild(defaultOption);
-                    }
-
-                    data.calle.forEach(calle => {
-                        const option = document.createElement('option');
-                        option.value = calle.id;
-                        option.textContent = calle.name;
-                        calleSelect.appendChild(option);
-                    });
-
-                    if (sufijo != 1) {
-                        const calleSe = JSON.parse('{{ context_json|escapejs }}');
-                        const calle = calleSe.calle;
-                        if (calle) {
-                            const seleccion = Array.from(calleSelect.options).find(option => option.value === calle);
-                            if (seleccion) {
-                                seleccion.selected = true;
-                                calleSelect.dispatchEvent(new Event('change'));
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error('Error al cargar las calles:', error));
-
-            if (sufijo == 1) {
-                filtrarTodo();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const ciudadSe = JSON.parse('{{ context_json|escapejs }}');
-            console.log("JEISON", ciudadSe)
-            if (ciudadSe) {
-                document.getElementById('num-banos').value = ciudadSe.num_banos || '';
-                document.getElementById('num-habitaciones').value = ciudadSe.num_habitaciones || '';
-                document.getElementById('metros-cuadrados').value = ciudadSe.m2 || '';
-
-                const plantaSelect = document.getElementById('planta');
-                plantaSelect.value = ciudadSe.planta || '';
-
-                const ascensorSelect = document.getElementById('tiene-ascensor');
-                ascensor = ciudadSe.ascensor;
-                if (ascensor !== undefined && ascensor !== null) {
-                    const seleccion = Array.from(ascensorSelect.options).find(option => option.value === String(ascensor));
-                    if (seleccion) {
-                        seleccion.selected = true;
-                        ascensorSelect.dispatchEvent(new Event('change'));
-                    }
+                if (sufijo == 1) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = "Todos";
+                    defaultOption.selected = true;
+                    distritoSelect.appendChild(defaultOption);
                 }
-                const estadoSelect = document.getElementById('estado-inmueble');
-                estadoSelect.value = ciudadSe.estado || '';
 
-                const tipoSelect = document.getElementById('tipo-vivienda');
-                tipoSelect.value = ciudadSe.tipo_vivienda || '';
-
-                const terrazaSelect = document.getElementById('tiene-terraza');
-                terrazaSelect.value = ciudadSe.terraza || '';
-
-                const balconSelect = document.getElementById('tiene-balcon');
-                balconSelect.value = ciudadSe.balcon || '';
-
-
-                const precio_min = document.getElementById('precio-minimo');
-                precio_min.textContent = ciudadSe.precio_minimo || '';
-
-                const precio_max = document.getElementById('precio-maximo');
-                precio_max.textContent = ciudadSe.precio_maximo || '';
-
-                const precio_esp = document.getElementById('precio-esperado');
-                precio_esp.textContent = ciudadSe.precio_esperado || '';
-
-                const precio_esu = document.getElementById('precio-esperado-unico');
-                precio_esu.textContent = ciudadSe.precio_esperado_unico || '';
-
-            }
-        });
-
-
-        document.body.addEventListener('click', function (event) {
-            if (event.target && event.target.matches('.export-to-excel')) {
-                excelAbrir();
-            }
-            if (event.target && event.target.matches('.open-record')) {
-                excelAbrir();
-            }
-        });
-        function excelAbrir() {
-            if (event.target && event.target.classList.contains('export-to-excel')) {
-                const viviendaMap = {
-                    0: "Estudio",
-                    1: "Piso",
-                    2: "Chalet adosado",
-                    3: "Dúplex",
-                    4: "Ático",
-                    5: "Chalet pareado",
-                    6: "Casa o chalet"
-                };
-                const plantaMap = {
-                    0: "Sótano",
-                    1: "Semi-Sótano",
-                    2: "Entreplanta",
-                    3: "Bajo",
-                    4: "1",
-                    5: "2",
-                    6: "3",
-                    7: "4",
-                    8: "5",
-                    9: "6",
-                    10: "7",
-                    11: "8"
-                };
-                const ascensorMap = {
-                    'false': "No",
-                    'true': "Sí"
-                };
-                const estadoInmuebleMap = {
-                    0: "Obra nueva",
-                    1: "Segunda Mano/buen estado",
-                    2: "Segunda Mano/para reformar",
-                    3: "No declara"
-                };
-                const terrazaBalconMap = {
-                    'false': "No",
-                    'true': "Sí"
-                };
-                const selectedRows = [];
-
-                document.querySelectorAll('tbody tr').forEach(row => {
-                    const checkbox = row.querySelector('input[type="checkbox"]');
-                    if (checkbox && checkbox.checked) {
-                        const rowData = {
-                            fecha_guardado: row.querySelector('td:nth-child(2)').textContent.trim(),
-                            modo: row.querySelector('td:nth-child(4)').textContent.trim(),
-                            ciudad: row.querySelector('td:nth-child(5)').textContent.trim(),
-                            distrito: row.querySelector('td:nth-child(6)').textContent.trim(),
-                            barrio: row.querySelector('td:nth-child(7)').textContent.trim(),
-                            calle: row.querySelector('td:nth-child(8)').textContent.trim(),
-                            planta: row.querySelector('td:nth-child(10)').textContent.trim(),
-                            tipo_vivienda: row.querySelector('td:nth-child(11)').textContent.trim(),
-                            estado_inmueble: row.querySelector('td:nth-child(12)').textContent.trim(),
-                            metros_cuadrados: row.querySelector('td:nth-child(13)').textContent.trim(),
-                            num_habitaciones: row.querySelector('td:nth-child(14)').textContent.trim(),
-                            num_banos: row.querySelector('td:nth-child(15)').textContent.trim(),
-                            terraza: row.querySelector('td:nth-child(16)').textContent.trim() === 'True' ? 'SI' : 'NO',
-                            balcon: row.querySelector('td:nth-child(17)').textContent.trim() === 'True' ? 'SI' : 'NO',
-                            ascensor: row.querySelector('td:nth-child(18)').textContent.trim() === 'True' ? 'SI' : 'NO',
-                            precio_minimo: row.querySelector('td:nth-child(19)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(18)').textContent.trim(),
-                            precio_esperado: row.querySelector('td:nth-child(20)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(19)').textContent.trim(),
-                            precio_maximo: row.querySelector('td:nth-child(21)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(20)').textContent.trim(),
-                            precio_esperado_unico: row.querySelector('td:nth-child(22)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(21)').textContent.trim(),
-                        };
-                        selectedRows.push(rowData);
-                        console.log("DATOS DEL EXCEL", rowData)
-                    }
+                data.distritos.forEach(distrito => {
+                    const option = document.createElement('option');
+                    option.value = distrito.id;
+                    option.textContent = distrito.name;
+                    distritoSelect.appendChild(option);
                 });
 
-                if (selectedRows.length === 0) {
-                    alert('Por favor, seleccione al menos una fila para exportar.');
-                    return;
+                if (sufijo != 1) {
+                    const distritoSe = JSON.parse('{{ context_json|escapejs }}');
+                    const distrito = distritoSe.distrito;
+                    console.log("distrito:", distrito);
+                    if (distrito) {
+                        const seleccion = Array.from(distritoSelect.options).find(option => option.value === distrito);
+                        if (seleccion) {
+                            seleccion.selected = true;
+                            distritoSelect.dispatchEvent(new Event('change'));
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar los distritos:', error));
+
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+    }
+    function cargarBarrios(sufijo) {
+        const distritoSelect = document.getElementById('distrito_' + sufijo);
+        const barrioSelect = document.getElementById('barrio_' + sufijo);
+
+        const distritoSeleccionado = distritoSelect?.value;
+
+        if (!distritoSeleccionado) {
+            console.log("No se seleccionó ningún distrito.");
+            if (barrioSelect) barrioSelect.innerHTML = '';
+            return;
+        }
+
+        console.log(`URL de la solicitud: /home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`);
+
+        fetch(`/home/get_barrios/${encodeURIComponent(distritoSeleccionado)}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos del servidor:', data);
+
+                if (!barrioSelect) return;
+                barrioSelect.innerHTML = '';
+                if (sufijo == 1) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = "Todos";
+                    defaultOption.selected = true;
+                    barrioSelect.appendChild(defaultOption);
                 }
 
-                fetch('/home/exportar_excel/', {
+                data.barrio.forEach(barrio => {
+                    const option = document.createElement('option');
+                    option.value = barrio.id;
+                    option.textContent = barrio.name;
+                    barrioSelect.appendChild(option);
+                });
+
+                if (sufijo != 1) {
+                    const barrioSe = JSON.parse('{{ context_json|escapejs }}');
+                    const barrio = barrioSe.barrio;
+                    if (barrio) {
+                        const seleccion = Array.from(barrioSelect.options).find(option => option.value === barrio);
+                        if (seleccion) {
+                            seleccion.selected = true;
+                            barrioSelect.dispatchEvent(new Event('change'));
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar los barrios:', error));
+
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+    }
+
+    function cargarCalle(sufijo) {
+        const barrioSelect = document.getElementById('barrio_' + sufijo);
+        const calleSelect = document.getElementById('calle_' + sufijo);
+
+        const barrioSeleccionado = barrioSelect?.value;
+
+        if (!barrioSeleccionado) {
+            console.log("No se seleccionó ningún barrio.");
+            if (calleSelect) calleSelect.innerHTML = '';
+            return;
+        }
+
+        console.log(`URL de la solicitud: /home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`);
+
+        fetch(`/home/get_calles/${encodeURIComponent(barrioSeleccionado)}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos del servidor:', data);
+
+                if (!calleSelect) return;
+                calleSelect.innerHTML = '';
+
+                if (sufijo == 1) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = "Todos";
+                    defaultOption.selected = true;
+                    calleSelect.appendChild(defaultOption);
+                }
+
+                data.calle.forEach(calle => {
+                    const option = document.createElement('option');
+                    option.value = calle.id;
+                    option.textContent = calle.name;
+                    calleSelect.appendChild(option);
+                });
+
+                if (sufijo != 1) {
+                    const calleSe = JSON.parse('{{ context_json|escapejs }}');
+                    const calle = calleSe.calle;
+                    if (calle) {
+                        const seleccion = Array.from(calleSelect.options).find(option => option.value === calle);
+                        if (seleccion) {
+                            seleccion.selected = true;
+                            calleSelect.dispatchEvent(new Event('change'));
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar las calles:', error));
+
+        if (sufijo == 1) {
+            filtrarTodo();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ciudadSe = JSON.parse('{{ context_json|escapejs }}');
+        console.log("JEISON", ciudadSe)
+        if (ciudadSe) {
+            document.getElementById('num-banos').value = ciudadSe.num_banos || '';
+            document.getElementById('num-habitaciones').value = ciudadSe.num_habitaciones || '';
+            document.getElementById('metros-cuadrados').value = ciudadSe.m2 || '';
+
+            const plantaSelect = document.getElementById('planta');
+            plantaSelect.value = ciudadSe.planta || '';
+
+            const ascensorSelect = document.getElementById('tiene-ascensor');
+            ascensor = ciudadSe.ascensor;
+            if (ascensor !== undefined && ascensor !== null) {
+                const seleccion = Array.from(ascensorSelect.options).find(option => option.value === String(ascensor));
+                if (seleccion) {
+                    seleccion.selected = true;
+                    ascensorSelect.dispatchEvent(new Event('change'));
+                }
+            }
+            const estadoSelect = document.getElementById('estado-inmueble');
+            estadoSelect.value = ciudadSe.estado || '';
+
+            const tipoSelect = document.getElementById('tipo-vivienda');
+            tipoSelect.value = ciudadSe.tipo_vivienda || '';
+
+            const terrazaSelect = document.getElementById('tiene-terraza');
+            terrazaSelect.value = ciudadSe.terraza || '';
+
+            const balconSelect = document.getElementById('tiene-balcon');
+            balconSelect.value = ciudadSe.balcon || '';
+
+
+            const precio_min = document.getElementById('precio-minimo');
+            precio_min.textContent = ciudadSe.precio_minimo || '';
+
+            const precio_max = document.getElementById('precio-maximo');
+            precio_max.textContent = ciudadSe.precio_maximo || '';
+
+            const precio_esp = document.getElementById('precio-esperado');
+            precio_esp.textContent = ciudadSe.precio_esperado || '';
+
+            const precio_esu = document.getElementById('precio-esperado-unico');
+            precio_esu.textContent = ciudadSe.precio_esperado_unico || '';
+
+        }
+    });
+
+
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    function filtrarTodo() {
+        console.log("filtrarTodo ejecutado");
+
+        const desdeInput = document.getElementById('desde');
+        const hastaInput = document.getElementById('hasta');
+
+        let desdeStr = '';
+        let hastaStr = '';
+
+        if (desdeInput && desdeInput.value) {
+            desdeStr = desdeInput.value;
+        }
+
+        if (hastaInput && hastaInput.value) {
+            hastaStr = hastaInput.value;
+        }
+
+        let ciudad = document.getElementById('ciudad_1')?.value.toLowerCase() || '';
+        let distrito = document.getElementById('distrito_1')?.value.toLowerCase() || '';
+        let barrio = document.getElementById('barrio_1')?.value.toLowerCase() || '';
+        let calle = document.getElementById('calle_1')?.value.toLowerCase() || '';
+
+        if (distrito === 'todos' || distrito === 'seleccionar') distrito = '';
+        if (barrio === 'todos' || barrio === 'seleccionar') barrio = '';
+        if (calle === 'todos' || calle === 'seleccionar') calle = '';
+
+        // Normaliza quitando "calle " si está al inicio en filtro calle
+        if (calle.startsWith('calle ')) {
+            calle = calle.substring(6);
+        }
+
+        const tabla = document.getElementById('valoraciones-table');
+        const filas = tabla.tBodies[0].rows;
+
+        for (let fila of filas) {
+            let mostrar = true;
+
+            const textoFecha = fila.cells[1].textContent.trim(); // dd/mm/yyyy
+            const partes = textoFecha.split('/');
+            let fechaFilaStr = '';
+
+            if (partes.length === 3) {
+                const dia = partes[0].padStart(2, '0');
+                const mes = partes[1].padStart(2, '0');
+                const anio = partes[2];
+                fechaFilaStr = `${anio}-${mes}-${dia}`; // yyyy-mm-dd
+            }
+
+            if (desdeStr && fechaFilaStr < desdeStr) mostrar = false;
+            if (hastaStr && fechaFilaStr > hastaStr) mostrar = false;
+
+            // Ubicación completa (calle, barrio, distrito, ciudad)
+            const ubicacion = fila.cells[4].textContent.toLowerCase();
+            const partesUbicacion = ubicacion.split(',').map(s => s.trim());
+
+            let calleFila = partesUbicacion[0] || '';
+            let barrioFila = partesUbicacion[1] || '';
+            let distritoFila = partesUbicacion[2] || '';
+            let ciudadFila = partesUbicacion[3] || '';
+
+            // Normaliza quitando "calle " al inicio en la fila también
+            if (calleFila.startsWith('calle ')) {
+                calleFila = calleFila.substring(6);
+            }
+
+            if (calle && !calleFila.includes(calle)) mostrar = false;
+            if (barrio && !barrioFila.includes(barrio)) mostrar = false;
+            if (distrito && !distritoFila.includes(distrito)) mostrar = false;
+            if (ciudad && !ciudadFila.includes(ciudad)) mostrar = false;
+
+            fila.style.display = mostrar ? '' : 'none';
+        }
+    }
+
+
+    document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
+        elem.addEventListener('change', filtrarTodo);
+    });
+
+
+    document.getElementById('ciudad_1').addEventListener('change', () => {
+        document.getElementById('distrito_1').innerHTML = '<option value="">-- Seleccionar distrito --</option>';
+        document.getElementById('barrio_1').innerHTML = '<option value="">-- Seleccionar barrio --</option>';
+        document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
+        filtrarTodo();
+    });
+    document.getElementById('distrito_1').addEventListener('change', () => {
+        document.getElementById('barrio_1').innerHTML = '<option value="">-- Seleccionar barrio --</option>';
+        document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
+        filtrarTodo();
+    });
+    document.getElementById('barrio_1').addEventListener('change', () => {
+        document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
+        filtrarTodo();
+    });
+
+    document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
+        elem.addEventListener('change', filtrarTodo);
+    });
+    document.getElementById('desde').addEventListener('change', filtrarTodo);
+    document.getElementById('hasta').addEventListener('change', filtrarTodo);
+
+
+    async function exportToPDF() {
+        const selectedRows = [];
+
+        // Obtener filas seleccionadas
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox && checkbox.checked) {
+                const rowData = {
+                    metros_cuadrados: parseFloat(row.querySelector('td:nth-child(12)').textContent.trim()) || 0,
+                    num_habitaciones: parseInt(row.querySelector('td:nth-child(13)').textContent.trim()) || 0,
+                    num_banos: parseInt(row.querySelector('td:nth-child(14)').textContent.trim()) || 0,
+                    ascensor: row.querySelector('td:nth-child(18)').textContent.trim() === 'True' ? '1' : '0'
+                };
+                selectedRows.push(rowData);
+            }
+        });
+
+        // Validaciones
+        if (selectedRows.length === 0) {
+            alert('Por favor, seleccione al menos una fila para generar el PDF.');
+            return;
+        }
+        if (selectedRows.length > 1) {
+            alert('Por favor, seleccione solo una fila para generar el PDF.');
+            return;
+        }
+
+        const selectedData = selectedRows[0];
+        console.log("Datos a enviar:", selectedData);
+
+        // Crear input de archivo para imágenes
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.multiple = true;
+
+        fileInput.onchange = async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) {
+                alert('Por favor, seleccione al menos una imagen.');
+                return;
+            }
+
+            // Mostrar mensaje de carga
+            const loadingAlert = alert('Generando PDF, por favor espere...');
+
+            // Abrir ventana inmediatamente (mejor compatibilidad con bloqueadores)
+            const pdfWindow = window.open('', '_blank');
+
+            try {
+                // Crear FormData con los datos
+                const formData = new FormData();
+                formData.append('metros_cuadrados', selectedData.metros_cuadrados);
+                formData.append('habitaciones', selectedData.num_habitaciones);
+                formData.append('banos', selectedData.num_banos);
+                formData.append('ascensor', selectedData.ascensor);
+
+                // Añadir imágenes
+                Array.from(files).forEach(file => {
+                    formData.append('imagenes[]', file);
+                });
+
+                // Enviar datos al servidor
+                const response = await fetch("/home/api/vivienda/", {
                     method: 'POST',
+                    body: formData,
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRFToken': getCsrfToken(),
-                    },
-                    body: JSON.stringify({ seleccionados: selectedRows }),
-                })
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'valoraciones_seleccionadas.xlsx';
-                        document.body.appendChild(a);
-                        a.click();
-                        a.remove();
-                    })
-                    .catch(error => console.error('Error al exportar el archivo:', error));
-            }
-
-            if (event.target && event.target.classList.contains('open-record')) {
-                const selectedRows = [];
-                document.querySelectorAll('tbody tr').forEach(row => {
-                    const checkbox = row.querySelector('input[type="checkbox"]');
-                    if (checkbox && checkbox.checked) {
-                        const rowData = {
-                            fecha_guardado: row.querySelector('td:nth-child(2)').textContent.trim(),
-                            modo: row.querySelector('td:nth-child(4)').textContent.trim(),
-                            ciudad: row.querySelector('td:nth-child(5)').textContent.trim(),
-                            distrito: row.querySelector('td:nth-child(6)').textContent.trim(),
-                            barrio: row.querySelector('td:nth-child(7)').textContent.trim(),
-                            calle: row.querySelector('td:nth-child(8)').textContent.trim(),
-                            planta: row.querySelector('td:nth-child(10)').textContent.trim(),
-                            tipo_vivienda: row.querySelector('td:nth-child(11)').textContent.trim(),
-                            estado_inmueble: row.querySelector('td:nth-child(12)').textContent.trim(),
-                            metros_cuadrados: row.querySelector('td:nth-child(13)').textContent.trim(),
-                            num_habitaciones: row.querySelector('td:nth-child(14)').textContent.trim(),
-                            num_banos: row.querySelector('td:nth-child(15)').textContent.trim(),
-                            terraza: row.querySelector('td:nth-child(16)').textContent.trim() === 'True' ? 'SI' : 'NO',
-                            balcon: row.querySelector('td:nth-child(17)').textContent.trim() === 'True' ? 'SI' : 'NO',
-                            ascensor: row.querySelector('td:nth-child(18)').textContent.trim() === 'True' ? 'SI' : 'NO',
-                            precio_minimo: row.querySelector('td:nth-child(19)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(18)').textContent.trim(),
-                            precio_esperado: row.querySelector('td:nth-child(20)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(19)').textContent.trim(),
-                            precio_maximo: row.querySelector('td:nth-child(21)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(20)').textContent.trim(),
-                            precio_esperado_unico: row.querySelector('td:nth-child(22)').textContent.trim() === 'None' ? '0' : row.querySelector('td:nth-child(21)').textContent.trim(),
-                        };
-                        selectedRows.push(rowData);
-                        console.log("DATOS SELECCIONADOS ", selectedRows)
                     }
                 });
 
-                if (selectedRows.length === 0) {
-                    return;
+                if (!response.ok) {
+                    throw new Error(`Error del servidor: ${response.status}`);
                 }
 
-                const selectedRecord = selectedRows[0];
-                if (selectedRows.length > 0) {
-                    const selectedRecord = selectedRows[0];
+                const data = await response.json();
+                console.log("Respuesta del servidor:", data);
 
-                    document.getElementById('ciudad_2').value = selectedRecord.ciudad;
-                    cargarDistritos('2');
-
-                    setTimeout(() => {
-                        document.getElementById('distrito_2').value = selectedRecord.distrito;
-                        cargarBarrios('2');
-
-                        setTimeout(() => {
-                            document.getElementById('barrio_2').value = selectedRecord.barrio;
-                            cargarCalle('2');
-
-                            setTimeout(() => {
-                                document.getElementById('calle_2').value = selectedRecord.calle;
-                            }, 300);
-                        }, 300);
-                    }, 300);
-
-
-                    document.getElementById('tipo-vivienda').value = selectedRecord.tipo_vivienda;
-                    document.getElementById('num-banos').value = selectedRecord.num_banos;
-                    document.getElementById('num-habitaciones').value = selectedRecord.num_habitaciones;
-                    document.getElementById('metros-cuadrados').value = selectedRecord.metros_cuadrados;
-                    document.getElementById('planta').value = selectedRecord.planta;
-                    document.getElementById('tiene-ascensor').value = selectedRecord.ascensor === 'SI' ? '1' : '0';
-                    document.getElementById('estado-inmueble').value = selectedRecord.estado_inmueble;
-
-
-                    document.getElementById('tiene-terraza').value = selectedRecord.terraza === 'SI' ? '1' : '0';
-                    document.getElementById('tiene-balcon').value = selectedRecord.balcon === 'SI' ? '1' : '0';
+                if (!data.pdf_url) {
+                    throw new Error('No se recibió URL del PDF');
                 }
-                const mainContent = document.getElementById('main-content');
 
-                document.body.addEventListener('click', function (event) {
-                    if (event.target && event.target.matches('.filter-button')) {
-                        filtrar();
-                    }
-                });
+                // Intentar abrir el PDF
+                if (pdfWindow) {
+                    pdfWindow.location.href = data.pdf_url;
+                } else {
+                    // Método alternativo si falla window.open
+                    const link = document.createElement('a');
+                    link.href = data.pdf_url;
+                    link.target = '_blank';
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    setTimeout(() => document.body.removeChild(link), 100);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al generar el PDF: ' + error.message);
+                if (pdfWindow) pdfWindow.close();
+            } finally {
+                // Cerrar alerta de carga si existe
+                if (loadingAlert && loadingAlert.close) loadingAlert.close();
             }
         };
 
-        function getCsrfToken() {
-            return document.querySelector('[name=csrfmiddlewaretoken]').value;
-        }
+        // Disparar el selector de archivos
+        fileInput.click();
+    }
 
-        function filtrarTodo() {
-            console.log("filtrarTodo ejecutado");
+    function getCsrfToken() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        return csrfToken ? csrfToken.value : '';
+    }
+    document.addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('select-all')) {
+            const checkboxes = document.querySelectorAll('#valoraciones-table tbody input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
 
-            const desdeInput = document.getElementById('desde');
-            const hastaInput = document.getElementById('hasta');
-
-            let desdeStr = '';
-            let hastaStr = '';
-
-            if (desdeInput && desdeInput.value) {
-                desdeStr = desdeInput.value;
-            }
-
-            if (hastaInput && hastaInput.value) {
-                hastaStr = hastaInput.value;
-            }
-
-            let ciudad = document.getElementById('ciudad_1')?.value.toLowerCase() || '';
-            let distrito = document.getElementById('distrito_1')?.value.toLowerCase() || '';
-            let barrio = document.getElementById('barrio_1')?.value.toLowerCase() || '';
-            let calle = document.getElementById('calle_1')?.value.toLowerCase() || '';
-
-            if (distrito === 'todos' || distrito === 'seleccionar') distrito = '';
-            if (barrio === 'todos' || barrio === 'seleccionar') barrio = '';
-            if (calle === 'todos' || calle === 'seleccionar') calle = '';
-
-            // Normaliza quitando "calle " si está al inicio en filtro calle
-            if (calle.startsWith('calle ')) {
-                calle = calle.substring(6);
-            }
-
-            const tabla = document.getElementById('valoraciones-table');
-            const filas = tabla.tBodies[0].rows;
-
-            for (let fila of filas) {
-                let mostrar = true;
-
-                const textoFecha = fila.cells[1].textContent.trim(); // dd/mm/yyyy
-                const partes = textoFecha.split('/');
-                let fechaFilaStr = '';
-
-                if (partes.length === 3) {
-                    const dia = partes[0].padStart(2, '0');
-                    const mes = partes[1].padStart(2, '0');
-                    const anio = partes[2];
-                    fechaFilaStr = `${anio}-${mes}-${dia}`; // yyyy-mm-dd
-                }
-
-                if (desdeStr && fechaFilaStr < desdeStr) mostrar = false;
-                if (hastaStr && fechaFilaStr > hastaStr) mostrar = false;
-
-                // Ubicación completa (calle, barrio, distrito, ciudad)
-                const ubicacion = fila.cells[4].textContent.toLowerCase();
-                const partesUbicacion = ubicacion.split(',').map(s => s.trim());
-
-                let calleFila = partesUbicacion[0] || '';
-                let barrioFila = partesUbicacion[1] || '';
-                let distritoFila = partesUbicacion[2] || '';
-                let ciudadFila = partesUbicacion[3] || '';
-
-                // Normaliza quitando "calle " al inicio en la fila también
-                if (calleFila.startsWith('calle ')) {
-                    calleFila = calleFila.substring(6);
-                }
-
-                if (calle && !calleFila.includes(calle)) mostrar = false;
-                if (barrio && !barrioFila.includes(barrio)) mostrar = false;
-                if (distrito && !distritoFila.includes(distrito)) mostrar = false;
-                if (ciudad && !ciudadFila.includes(ciudad)) mostrar = false;
-
-                fila.style.display = mostrar ? '' : 'none';
+            if (allChecked) {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                event.target.textContent = 'Seleccionar Todo';
+            } else {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                event.target.textContent = 'Deseleccionar Todo';
             }
         }
+    });
 
+</script>
+<style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        overflow-x: hidden;
+        background: #f8f9fa;
+    }
 
-        document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
-            elem.addEventListener('change', filtrarTodo);
-        });
+    .container-fluid {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100%;
+    }
 
+    .bg-blue {
+        background-color: #001ba3 !important;
+    }
 
-        document.getElementById('ciudad_1').addEventListener('change', () => {
-            document.getElementById('distrito_1').innerHTML = '<option value="">-- Seleccionar distrito --</option>';
-            document.getElementById('barrio_1').innerHTML = '<option value="">-- Seleccionar barrio --</option>';
-            document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
-            filtrarTodo();
-        });
-        document.getElementById('distrito_1').addEventListener('change', () => {
-            document.getElementById('barrio_1').innerHTML = '<option value="">-- Seleccionar barrio --</option>';
-            document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
-            filtrarTodo();
-        });
-        document.getElementById('barrio_1').addEventListener('change', () => {
-            document.getElementById('calle_1').innerHTML = '<option value="">-- Seleccionar calle --</option>';
-            filtrarTodo();
-        });
+    .btn-clear {
+        background-color: #00e1a1;
+        color: white;
+        border: none;
+    }
 
-        document.querySelectorAll('.filter-section input, .filter-section select').forEach(elem => {
-            elem.addEventListener('change', filtrarTodo);
-        });
-        document.getElementById('desde').addEventListener('change', filtrarTodo);
-        document.getElementById('hasta').addEventListener('change', filtrarTodo);
+    .btn-clear:hover {
+        background-color: #00997a;
+        color: #fff;
+    }
 
+    .form-section {
+        background-color: white;
+        padding: 20px;
+    }
 
+    .table-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
 
+    .header-white {
+        background-color: white;
+        height: 70px;
+    }
 
-    </script>
-    <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            overflow-x: hidden;
-            background: #f8f9fa;
-        }
+    .filter-section {
+        background-color: #001ba3;
+        color: white;
+        padding: 10px 0;
+        border-radius: 0 0 8px 8px;
+    }
 
-        .container-fluid {
-            padding: 0 !important;
-            margin: 0 !important;
-            max-width: 100%;
-        }
+    #valoraciones-table th {
+        padding-top: 0.68rem;
+        padding-bottom: 0.68rem;
+        background-color: #001ba3;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+    }
 
-        .bg-blue {
-            background-color: #001ba3 !important;
-        }
+    #valoraciones-table td {
+        padding-top: 0.68rem;
+        padding-bottom: 0.68rem;
+        background-color: white;
+        color: black;
+        text-align: center;
+        vertical-align: middle;
+    }
 
-        .btn-clear {
-            background-color: #00e1a1;
-            color: white;
-            border: none;
-        }
+    .table-bordered {
+        border: 2px solid #000000;
+    }
 
-        .btn-clear:hover {
-            background-color: #00997a;
-            color: #fff;
-        }
+    .hidden-column {
+        display: none;
+    }
 
-        .form-section {
-            background-color: white;
-            padding: 20px;
-        }
+    .btn-outline-primary {
+        color: #001ba3;
+        border-color: #001ba3;
+    }
 
-        .table-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
+    .btn-outline-primary:hover {
+        background-color: #001ba3;
+        color: white;
+    }
 
-        .header-white {
-            background-color: white;
-            height: 70px;
-        }
+    .table-container button {
+        min-width: 150px;
+    }
 
+    @media (max-width: 991.98px) {
+
+        .table-section,
         .filter-section {
-            background-color: #001ba3;
-            color: white;
-            padding: 10px 0;
-            border-radius: 0 0 8px 8px;
-        }
-
-        #valoraciones-table th {
-            padding-top: 0.68rem;
-            padding-bottom: 0.68rem;
-            background-color: #001ba3;
-            color: white;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        #valoraciones-table td {
-            padding-top: 0.68rem;
-            padding-bottom: 0.68rem;
-            background-color: white;
-            color: black;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .table-bordered {
-            border: 2px solid #000000;
-        }
-
-        .hidden-column {
-            display: none;
-        }
-
-        .btn-outline-primary {
-            color: #001ba3;
-            border-color: #001ba3;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: #001ba3;
-            color: white;
+            padding: 10px;
         }
 
         .table-container button {
-            min-width: 150px;
+            min-width: 100px;
+            font-size: 0.95rem;
         }
+    }
 
-        @media (max-width: 991.98px) {
-
-            .table-section,
-            .filter-section {
-                padding: 10px;
-            }
-
-            .table-container button {
-                min-width: 100px;
-                font-size: 0.95rem;
-            }
-        }
-
-        .btn-spacing {
-            margin-right: 20px;
-        }
-    </style>
-    {% endblock %}
+    .btn-spacing {
+        margin-right: 20px;
+    }
+</style>
+{% endblock %}

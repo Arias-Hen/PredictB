@@ -181,3 +181,21 @@ class PredictionModel:
         finally:
             if conn:
                 conn.close()
+                
+class Vivienda(models.Model):
+    metros_cuadrados = models.PositiveIntegerField()
+    habitaciones = models.PositiveIntegerField()
+    banos = models.PositiveIntegerField()
+    ascensor = models.BooleanField()
+    descripcion = models.TextField(blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Vivienda {self.id} - {self.metros_cuadrados} m2"
+
+class ImagenVivienda(models.Model):
+    vivienda = models.ForeignKey(Vivienda, related_name='imagenes', on_delete=models.CASCADE)
+    imagen = models.ImageField(upload_to='viviendas/')
+
+    def __str__(self):
+        return f"Imagen de Vivienda {self.vivienda.id}"

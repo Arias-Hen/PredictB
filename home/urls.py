@@ -24,5 +24,7 @@ urlpatterns = [
     path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
     path('terminos/', views.terminos, name='terminos'),
     path('get_radar_data/', views.get_radar_data, name='get_radar_data'),
+    path('c_vivienda', views.formulario_vivienda, name='formulario_vivienda'),
+    path('api/vivienda/', views.crear_vivienda_api, name='crear_vivienda_api'),
 
 ]

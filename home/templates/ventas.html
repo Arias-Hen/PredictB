@@ -323,7 +323,7 @@
                         <button class="export-to-excel btn btn-hover-green me-2" style="margin-bottom: 10px;">
                             Exportar a Excel
                         </button>
-                        <button class="open-record btn btn-hover-blue" style="margin-bottom: 10px;">Seleccionar
+                        <button class="select-all btn btn-hover-blue" style="margin-bottom: 10px;">Seleccionar
                             Todo</button>
                     </div>
                 </div>
@@ -1041,6 +1041,24 @@
         }
 
         console.log('Valoración guardada correctamente.');
+    });
+    document.addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('select-all')) {
+            const checkboxes = document.querySelectorAll('#valoraciones-table tbody input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+            if (allChecked) {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                event.target.textContent = 'Seleccionar Todo';
+            } else {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                event.target.textContent = 'Deseleccionar Todo';
+            }
+        }
     });
 
 </script>

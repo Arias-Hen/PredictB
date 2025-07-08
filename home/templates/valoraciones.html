@@ -657,7 +657,7 @@
           document.getElementById("precio-maximo").textContent =
             responseData.precio_maximo.toFixed(2);
 
-          const radarResponse = await fetch("/home/get_radar_data/", {
+         /* const radarResponse = await fetch("/home/get_radar_data/", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -678,9 +678,9 @@
               balcon: data.balcon,
               ascensor: data.ascensor,
             }),
-          });
-          const radarData = await radarResponse.json();
-          renderRadarChart(radarData, data.barrio);
+          });*/
+          //const radarData = await radarResponse.json();
+          //renderRadarChart(radarData, data.barrio);
           data.precio_minimo = responseData.precio_minimo;
           data.precio_esperado = responseData.precio_esperado;
           data.precio_maximo = responseData.precio_maximo;
