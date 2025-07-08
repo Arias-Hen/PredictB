@@ -519,8 +519,6 @@ def get_radar_data(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
     
-OPENAI_API_KEY = "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"  # ← pon aquí tu clave real
-
 def formulario_vivienda(request):
     return render(request, 'crear_vivienda.html')
 
