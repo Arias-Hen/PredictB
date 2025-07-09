@@ -189,8 +189,7 @@ LOGGING = {
 }
 LOGIN_URL = 'home/login/'
 LOGIN_REDIRECT_URL = 'home:valoraciones'
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'proyecto2-static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
