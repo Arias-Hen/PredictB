@@ -54,11 +54,11 @@ if APPENGINE_URL:
     if not urlparse(APPENGINE_URL).scheme:
         APPENGINE_URL = f'https://{APPENGINE_URL}'
 
-    ALLOWED_HOSTS = [urlparse(APPENGINE_URL).netloc]
+    ALLOWED_HOSTS = ['3.144.14.37',urlparse(APPENGINE_URL).netloc]
     CSRF_TRUSTED_ORIGINS = [APPENGINE_URL]
     SECURE_SSL_REDIRECT = True
 else:
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ['3.144.14.37', '*']
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
