@@ -174,6 +174,12 @@
             </div>
         </div>
     </div>
+    <div id="pdf-loading-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center;">
+        <div style="text-align:center; font-size:24px; color:#0044cc; font-weight:bold;">
+            Generando PDF, por favor espere...
+        </div>
+    </div>
 
 </body>
 <script>
@@ -555,11 +561,9 @@
     document.getElementById('desde').addEventListener('change', filtrarTodo);
     document.getElementById('hasta').addEventListener('change', filtrarTodo);
 
-
     async function exportToPDF() {
         const selectedRows = [];
 
-        // Obtener filas seleccionadas
         document.querySelectorAll('tbody tr').forEach(row => {
             const checkbox = row.querySelector('input[type="checkbox"]');
             if (checkbox && checkbox.checked) {
@@ -573,7 +577,6 @@
             }
         });
 
-        // Validaciones
         if (selectedRows.length === 0) {
             alert('Por favor, seleccione al menos una fila para generar el PDF.');
             return;
@@ -586,7 +589,6 @@
         const selectedData = selectedRows[0];
         console.log("Datos a enviar:", selectedData);
 
-        // Crear input de archivo para imágenes
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
@@ -599,26 +601,19 @@
                 return;
             }
 
-            // Mostrar mensaje de carga
-            const loadingAlert = alert('Generando PDF, por favor espere...');
-
-            // Abrir ventana inmediatamente (mejor compatibilidad con bloqueadores)
-            const pdfWindow = window.open('', '_blank');
+            showPDFLoadingModal();
 
             try {
-                // Crear FormData con los datos
                 const formData = new FormData();
                 formData.append('metros_cuadrados', selectedData.metros_cuadrados);
                 formData.append('habitaciones', selectedData.num_habitaciones);
                 formData.append('banos', selectedData.num_banos);
                 formData.append('ascensor', selectedData.ascensor);
 
-                // Añadir imágenes
                 Array.from(files).forEach(file => {
                     formData.append('imagenes[]', file);
                 });
 
-                // Enviar datos al servidor
                 const response = await fetch("/home/api/vivienda/", {
                     method: 'POST',
                     body: formData,
@@ -638,33 +633,27 @@
                     throw new Error('No se recibió URL del PDF');
                 }
 
-                // Intentar abrir el PDF
-                if (pdfWindow) {
-                    pdfWindow.location.href = data.pdf_url;
-                } else {
-                    // Método alternativo si falla window.open
-                    const link = document.createElement('a');
-                    link.href = data.pdf_url;
-                    link.target = '_blank';
-                    link.style.display = 'none';
-                    document.body.appendChild(link);
-                    link.click();
-                    setTimeout(() => document.body.removeChild(link), 100);
-                }
+                window.open(data.pdf_url, '_blank');
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = data.pdf_url;
+                downloadLink.download = 'vivienda.pdf';
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                setTimeout(() => document.body.removeChild(downloadLink), 100);
 
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error al generar el PDF: ' + error.message);
-                if (pdfWindow) pdfWindow.close();
             } finally {
-                // Cerrar alerta de carga si existe
-                if (loadingAlert && loadingAlert.close) loadingAlert.close();
+                hidePDFLoadingModal();
             }
         };
 
-        // Disparar el selector de archivos
         fileInput.click();
     }
+
 
     function getCsrfToken() {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -688,6 +677,15 @@
             }
         }
     });
+    function showPDFLoadingModal() {
+        const modal = document.getElementById('pdf-loading-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function hidePDFLoadingModal() {
+        const modal = document.getElementById('pdf-loading-modal');
+        if (modal) modal.style.display = 'none';
+    }
 
 </script>
 <style>
