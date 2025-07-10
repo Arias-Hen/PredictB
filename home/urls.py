@@ -27,5 +27,5 @@ urlpatterns = [
     path('get_radar_data/', views.get_radar_data, name='get_radar_data'),
     path('c_vivienda', views.formulario_vivienda, name='formulario_vivienda'),
     path('api/vivienda/', views.crear_vivienda_api, name='crear_vivienda_api'),
-    path('logout/', LogoutView.as_view(next_page='/home/login/'), name='logout'),
+    path('logout/', LogoutView.as_view(next_page='/home/'), name='logout'),
 ]
