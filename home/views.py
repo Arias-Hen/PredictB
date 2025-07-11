@@ -54,6 +54,7 @@ def valoraciones(request):
     user = request.user
     user_id = user.uniqueid
     user_nombre = user.nombre
+    email = user.email
     try:
         with open('distritos.csv', newline='', encoding='ISO-8859-1') as csvfile:
             reader = csv.DictReader(csvfile)
@@ -73,7 +74,7 @@ def valoraciones(request):
         print(f"Error al leer el archivo CSV: {e}")
         options_json = '[]'
 
-    return render(request, 'valoraciones.html', {'options_json': options_json, 'user_id': user_id, 'user_nombre': user_nombre})
+    return render(request, 'valoraciones.html', {'options_json': options_json, 'user_id': user_id, 'user_nombre': user_nombre, 'email':user.email})
 
 @csrf_exempt
 @login_required
@@ -81,6 +82,7 @@ def ventas(request):
     user = request.user
     user_id = user.uniqueid
     user_nombre = user.nombre
+    email = user.email
     context = []  
     context_json = '{}' 
     if request.method == 'POST':
@@ -163,7 +165,7 @@ def ventas(request):
             })
     except FileNotFoundError:
         print("Archivo de valoraciones no encontrado.")
-    return render(request, 'ventas.html', {'options_json': options_json, 'context_json': context_json, 'valoraciones':valoraciones, 'user_nombre': user_nombre, 'user_id': user_id})
+    return render(request, 'ventas.html', {'options_json': options_json, 'context_json': context_json, 'valoraciones':valoraciones, 'user_nombre': user_nombre, 'user_id': user_id, 'email':user.email})
 
 @csrf_exempt
 @login_required
@@ -171,7 +173,7 @@ def informes(request):
     user = request.user
     user_id = user.uniqueid
     user_nombre = user.nombre
-
+    email = user.email
     context = []  
     context_json = '{}' 
 
@@ -229,6 +231,7 @@ def informes(request):
         'valoraciones': valoraciones,
         'user_id': user_id,
         'user_nombre': user.nombre,
+        'email':user.email
     })
 def generarinf(request):
     return render(request, 'generarinf.html')
@@ -402,27 +405,41 @@ def user_login(request):
 def user_register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
+        print("POST data:", request.POST)
+
         if form.is_valid():
             cd = form.cleaned_data
-            if Users.objects.filter(usuario=cd['username']).exists():
+            username = cd['usuario']
+            email = cd['email']
+            password = cd['password']
+
+            if Users.objects.filter(usuario=username).exists():
                 messages.error(request, 'El nombre de usuario ya está en uso. Por favor, elige otro.')
+            elif Users.objects.filter(email=email).exists():
+                messages.error(request, 'Ya existe una cuenta registrada con este email.')
             else:
                 try:
                     new_user = Users(
-                        usuario=cd['username'],
+                        usuario=cd['usuario'],  # <--- aquí el cambio
+                        email=email,
+                        nombre=username,
                         empresa='Mi Empresa',
-                        nombre=cd['username'],
-                        password=make_password(cd['password']),
+                        password=make_password(password),
                         estado=True
                     )
                     new_user.save()
-                    messages.success(request, 'Registro exitoso! Ahora puedes iniciar sesión.')
-                    return redirect('/home/login')
-                except IntegrityError:
+                    messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión.')
+                    return redirect('/home/login/')
+                except IntegrityError as e:
                     messages.error(request, 'Hubo un error al registrar el usuario. Intenta nuevamente.')
+                    print("Error al guardar usuario:", e)
+        else:
+            messages.error(request, 'Formulario inválido. Revisa los campos.')
+            print("Errores del formulario:", form.errors)
     else:
         form = RegistrationForm()
     return render(request, 'register.html', {'form': form})
+
 
 @csrf_exempt
 def exportar_excel(request):

@@ -32,6 +32,7 @@ class UsersManager(BaseUserManager):
 class Users(AbstractBaseUser, PermissionsMixin):
     uniqueid = models.AutoField(primary_key=True)
     usuario = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(unique=True)
     empresa = models.CharField(max_length=100, default='Mi Empresa')
     nombre = models.CharField(max_length=100)
     estado = models.BooleanField(default=True)
@@ -42,12 +43,12 @@ class Users(AbstractBaseUser, PermissionsMixin):
 
     groups = models.ManyToManyField(
         'auth.Group',
-        related_name='custom_user_set',  # Nombre único para evitar conflictos
+        related_name='custom_user_set',
         blank=True,
     )
     user_permissions = models.ManyToManyField(
         'auth.Permission',
-        related_name='custom_user_permissions',  # Nombre único para evitar conflictos
+        related_name='custom_user_permissions',
         blank=True,
     )
 
