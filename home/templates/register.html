@@ -7,113 +7,118 @@
     <title>Registro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
-<body>
-    <div class="container-fluid d-flex justify-content-end align-items-center mt-5">
-        <div class="card p-4 shadow-lg me-5 mt-n5" style="max-width: 500px; width: 100%; background-color: hsl(229, 94%, 31%); border-radius: 20px;">
-            <h3 class="text-white text-center mb-4">CREATE YOUR ACCOUNT</h3>
+<body style="background: linear-gradient(120deg, #e9eefd 0%, #ffffff 100%); min-height: 100vh;">
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card p-5 shadow-lg"
+            style="max-width: 400px; width: 100%; border-radius: 24px; background: linear-gradient(135deg, #0001a0 70%, #2a3cff 100%);">
+            <div class="text-center mb-4">
+                <img src="{% static 'images/logo.jpeg' %}" alt="Logo PredictBuild" width="70"
+                    class="mb-3 rounded shadow-sm">
+                <h3 class="text-white mb-2">Crear Cuenta</h3>
+                <p class="text-white-50 mb-0">Regístrate para acceder a PredictBuild</p>
+            </div>
+
             {% if messages %}
             <div class="alert-container">
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-white" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-white" role="alert"
+                    style="background:rgba(0,0,0,0.3);">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
+                        aria-label="Close"></button>
                 </div>
                 {% endfor %}
             </div>
             {% endif %}
 
-            <form method="POST">
+            <form method="POST" autocomplete="off">
                 {% csrf_token %}
+
                 <div class="mb-3">
-                    <label for="username" class="form-label text-white">Username:</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                    <label for="usuario" class="form-label text-white">Usuario:</label>
+                    <input type="text" class="form-control form-control-lg" id="usuario" name="usuario" required
+                        autocomplete="username">
                 </div>
+
                 <div class="mb-3">
                     <label for="email" class="form-label text-white">Email:</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="email" class="form-control form-control-lg" id="email" name="email" required
+                        autocomplete="email">
                 </div>
+
                 <div class="mb-3">
-                    <label for="password" class="form-label text-white">Password:</label>
-                    <div></div>
-                    {{ form.password }}                
-                <div class="mb-3">
-                    <label for="confirm_password" class="form-label text-white">Confirm Password:</label>
-                    <div></div>
-                    {{ form.confirm_password }}
+                    <label for="password" class="form-label text-white">Contraseña:</label>
+                    <input type="password" name="password" id="password" class="form-control form-control-lg" required>
                 </div>
+
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label text-white">Confirmar Contraseña:</label>
+                    <input type="password" name="confirm_password" id="confirm_password"
+                        class="form-control form-control-lg" required>
+                </div>
+
+
                 <div class="mb-3 form-check">
                     <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
                     <label class="form-check-label text-white" for="terms">
-                        Acepto los <a href="/home/terminos" class="text-white text-decoration-underline">términos y condiciones</a> establecidos en el Aviso Legal y Política de Privacidad *
+                        Acepto los <a href="/home/terminos" class="text-white text-decoration-underline">términos y
+                            condiciones</a> establecidos en el Aviso Legal y Política de Privacidad *
                     </label>
                 </div>
-                <p>
-                    <a href='/home/login/' class="text-decoration-none text-white">
-                        ¿Tienes una cuenta? <br> Iniciar Sesion
-                    </a>
-                </p>
-                <button type="submit" class="btn btn-light w-100 fw-bold">REGISTER</button>
+
+                <button type="submit" class="btn btn-light w-100 fw-bold py-2 mb-2"
+                    style="border-radius: 16px;">Registrar</button>
             </form>
+
+            <div class="text-center mt-3">
+                <span class="text-white-50">¿Ya tienes cuenta?</span>
+                <a href="/home/login/" class="text-white fw-bold text-decoration-underline">Inicia sesión</a>
+            </div>
         </div>
     </div>
 </body>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-
 <style>
-    .login-container {
-        position: absolute;
-        top: 52%;
-        right: 14%;
-        transform: translateY(-50%);
-        background-color: hsl(229, 94%, 31%);
-        padding: 2rem;
-        border-radius: 80px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 30%;
-        height: auto;
+    .card {
+        border: none;
+        box-shadow: 0 4px 32px rgba(0, 0, 0, 0.10);
     }
 
-    .login-container input {
-        margin-bottom: 1rem;
-        background-color: #fff;
-        color: #333;
-        padding: 1rem;
+    .form-control {
+        border-radius: 12px;
+        border: 2px solid #0001a0;
         font-size: 1.1rem;
     }
 
-    .login-container .btn-login {
-        background-color: #fff;
-        color: #000000;
-        font-size: 2.2rem;
-        padding: 0.8rem 1.5rem;
+    .form-control:focus {
+        border-color: #2a3cff;
+        box-shadow: 0 0 0 0.15rem rgba(42, 60, 255, 0.08);
+    }
+
+    .btn-light {
+        background: #fff;
+        color: #0001a0;
         border: none;
-        border-radius: 20px;
-        font-weight: bold;
-        display: block;
-        width: auto;
-        margin-left: auto;
+        font-size: 1.1rem;
+        transition: background 0.2s, color 0.2s;
     }
 
-    .login-container h3 {
-        color: white;
-        margin-bottom: 1.5rem;
-        text-align: center;
-        font-size: 4rem;
+    .btn-light:hover,
+    .btn-light:focus {
+        background: #0001a0;
+        color: #fff;
     }
 
-    .login-container label {
-        font-size: 1.8rem;
-    }
-
-    .login-container a {
-        color: white;
-        text-decoration: none;
+    .alert-container {
+        margin-bottom: 1rem;
     }
 </style>
 
-</html>
 {% endblock %}
