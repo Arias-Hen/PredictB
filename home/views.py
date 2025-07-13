@@ -32,6 +32,23 @@ from .models import Vivienda, ImagenVivienda
 from .utils import generar_pdf
 import requests
 from openai import OpenAI
+from .models import Informe
+from django.core.files import File
+from django.core.mail import EmailMessage
+import logging
+import os
+import logging
+import smtplib
+from django.core.mail import EmailMessage
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from .models import Vivienda, ImagenVivienda, Informe
+from django.core.files import File
+from .utils import generar_pdf
+from openai import OpenAI
+from fpdf import FPDF
+logger = logging.getLogger(__name__)
 
 def home(request):
     return render(request, 'home.html')
@@ -538,6 +555,7 @@ def get_radar_data(request):
     
 def formulario_vivienda(request):
     return render(request, 'crear_vivienda.html')
+User = get_user_model()
 
 @csrf_exempt
 def crear_vivienda_api(request):
@@ -560,9 +578,24 @@ def crear_vivienda_api(request):
 
         for file in request.FILES.getlist("imagenes[]"):
             ImagenVivienda.objects.create(vivienda=vivienda, imagen=file)
-
+        
         imagenes = [img.imagen.path for img in vivienda.imagenes.all()]
         ruta_pdf = generar_pdf(vivienda, imagenes)
+        
+        try:
+            usuario = request.user
+
+
+            ruta_relativa = ruta_pdf.replace('/media/', '')
+            ruta_completa = os.path.join(settings.MEDIA_ROOT, ruta_relativa)
+
+            with open(ruta_completa, 'rb') as f:
+                informe = Informe.objects.create(
+                    usuario=usuario,
+                    archivo_pdf=File(f, name=os.path.basename(ruta_relativa))
+        )
+        except Exception as e:
+            print(f"❌ Error al guardar informe: {e}")
 
         return JsonResponse({
             "ok": True,
@@ -570,7 +603,60 @@ def crear_vivienda_api(request):
             "descripcion": descripcion,
             "pdf_url": ruta_pdf
         })
+    return JsonResponse({"error": "Método no permitido"}, status=405)
 
+@csrf_exempt
+def enviar_vivienda_email(request):
+    if request.method == 'POST':
+        print("📩 Recibido POST en /api/vivienda/")
+        m2 = request.POST.get("metros_cuadrados")
+        hab = request.POST.get("habitaciones")
+        banos = request.POST.get("banos")
+        ascensor = request.POST.get("ascensor") == "true"
+
+        descripcion = generar_descripcion_vivienda(m2, hab, banos, ascensor)
+
+        vivienda = Vivienda.objects.create(
+            metros_cuadrados=m2,
+            habitaciones=hab,
+            banos=banos,
+            ascensor=ascensor,
+            descripcion=descripcion
+        )
+
+        for file in request.FILES.getlist("imagenes[]"):
+            ImagenVivienda.objects.create(vivienda=vivienda, imagen=file)
+        
+        imagenes = [img.imagen.path for img in vivienda.imagenes.all()]
+        ruta_pdf = generar_pdf(vivienda, imagenes)
+        
+        try:
+            usuario = request.user
+            email = usuario.email 
+            ruta_relativa = ruta_pdf.replace('/media/', '')
+            ruta_completa = os.path.join(settings.MEDIA_ROOT, ruta_relativa)
+            with open(ruta_completa, 'rb') as f:
+                pdf_content = f.read()
+
+            email_message = EmailMessage(
+                subject='🏠 Informe de Vivienda Generado',
+                body=f'Estimado/a {usuario.nombre},\n\nAdjunto encontrarás el informe PDF generado automáticamente con la descripción de tu vivienda.\n\n{descripcion}',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email],
+            )
+            email_message.attach('informe_vivienda.pdf', pdf_content, 'application/pdf')
+            email_message.send()
+
+
+        except Exception as e:
+            print("Error al guardar informe")
+
+        return JsonResponse({
+            "ok": True,
+            "mensaje": "Reporte generado",
+            "descripcion": descripcion,
+            "pdf_url": ruta_pdf
+        })
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 def generar_descripcion_vivienda(m2, hab, banos, ascensor):

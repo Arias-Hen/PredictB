@@ -161,13 +161,9 @@
                             EXPORTAR A PDF
                         </button>
                         <button class="open-record btn btn-primary mb-2 btn-spacing"
-                            style="background-color: #001ba3 !important; color: #fff !important;">
+                            style="background-color: #001ba3 !important; color: #fff !important;"
+                            onclick="sentToEmail()">
                             Enviar a
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-envelope" viewBox="0 0 16 16">
-                                <path
-                                    d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
-                            </svg>
                         </button>
                     </div>
                 </div>
@@ -180,7 +176,12 @@
             Generando PDF, por favor espere...
         </div>
     </div>
-
+    <div id="pdf-loading-modal2"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center;">
+        <div style="text-align:center; font-size:24px; color:#0044cc; font-weight:bold;">
+            Enviando PDF, por favor espere...
+        </div>
+    </div>
 </body>
 <script>
     document.getElementById('tipo_1').addEventListener('change', filtrarTodo);
@@ -653,7 +654,87 @@
 
         fileInput.click();
     }
+    async function sentToEmail() {
+        const selectedRows = [];
 
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox && checkbox.checked) {
+                const rowData = {
+                    metros_cuadrados: parseFloat(row.querySelector('td:nth-child(12)').textContent.trim()) || 0,
+                    num_habitaciones: parseInt(row.querySelector('td:nth-child(13)').textContent.trim()) || 0,
+                    num_banos: parseInt(row.querySelector('td:nth-child(14)').textContent.trim()) || 0,
+                    ascensor: row.querySelector('td:nth-child(18)').textContent.trim() === 'True' ? '1' : '0'
+                };
+                selectedRows.push(rowData);
+            }
+        });
+
+        if (selectedRows.length === 0) {
+            alert('Por favor, seleccione al menos una fila para enviar el PDF.');
+            return;
+        }
+        if (selectedRows.length > 1) {
+            alert('Por favor, seleccione solo una fila para enviar el PDF.');
+            return;
+        }
+
+        const selectedData = selectedRows[0];
+        console.log("Datos a enviar:", selectedData);
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.multiple = true;
+
+        fileInput.onchange = async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) {
+                alert('Por favor, seleccione al menos una imagen.');
+                return;
+            }
+
+            sendPDFLoadingModal();
+
+            try {
+                const formData = new FormData();
+                formData.append('metros_cuadrados', selectedData.metros_cuadrados);
+                formData.append('habitaciones', selectedData.num_habitaciones);
+                formData.append('banos', selectedData.num_banos);
+                formData.append('ascensor', selectedData.ascensor);
+
+                Array.from(files).forEach(file => {
+                    formData.append('imagenes[]', file);
+                });
+
+                const response = await fetch("/home/api/enviar_vivienda/", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error del servidor: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Respuesta del servidor:", data);
+
+                if (!data.pdf_url) {
+                    throw new Error('No se recibió URL del PDF');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al generar el PDF: ' + error.message);
+            } finally {
+                hidePDFLoadingModal2();
+            }
+        };
+
+        fileInput.click();
+    }  
 
     function getCsrfToken() {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -684,6 +765,15 @@
 
     function hidePDFLoadingModal() {
         const modal = document.getElementById('pdf-loading-modal');
+        if (modal) modal.style.display = 'none';
+    }
+    function sendPDFLoadingModal() {
+        const modal = document.getElementById('pdf-loading-modal2');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function hidePDFLoadingModal2() {
+        const modal = document.getElementById('pdf-loading-modal2');
         if (modal) modal.style.display = 'none';
     }
 

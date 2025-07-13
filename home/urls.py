@@ -28,4 +28,5 @@ urlpatterns = [
     path('c_vivienda', views.formulario_vivienda, name='formulario_vivienda'),
     path('api/vivienda/', views.crear_vivienda_api, name='crear_vivienda_api'),
     path('logout/', LogoutView.as_view(next_page='/home/'), name='logout'),
+    path('api/enviar_vivienda/', views.enviar_vivienda_email, name='enviar_vivienda_email'),
 ]

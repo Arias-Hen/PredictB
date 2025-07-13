@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import psycopg2
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 class Task(models.Model):
     title = models.CharField(max_length=100)
@@ -200,3 +201,15 @@ class ImagenVivienda(models.Model):
 
     def __str__(self):
         return f"Imagen de Vivienda {self.vivienda.id}"
+    
+User = get_user_model()
+class Informe(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    archivo_pdf = models.FileField(upload_to='informes/')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Informe de {self.usuario.nombre} - {self.fecha_creacion.strftime('%Y-%m-%d')}"
+
+    class Meta:
+        db_table = 'data"."informes' 
