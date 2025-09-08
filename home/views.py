@@ -401,23 +401,57 @@ def modificar_valoracion(request):
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 def user_login(request):
+    form = LoginForms(request.POST or None)
+    
     if request.method == 'POST':
-        form = LoginForms(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            user = authenticate(request, username=cd['username'], password=cd['password'])
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            user = authenticate(request, username=username, password=password)
+
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    next_url = request.GET.get('next', '/home/valoraciones/')
-                    return redirect(next_url)
+                    # Para solicitudes AJAX
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        next_url = request.GET.get('next', '/home/valoraciones/')
+                        return JsonResponse({
+                            'success': True, 
+                            'redirect_url': next_url
+                        })
+                    else:
+                        next_url = request.GET.get('next', '/home/valoraciones/')
+                        return redirect(next_url)
                 else:
-                    messages.error(request, 'Cuenta desactivada. Contacta al administrador.')
+                    error_msg = 'Cuenta desactivada. Contacta al administrador.'
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': False, 
+                            'message': error_msg
+                        })
+                    else:
+                        messages.error(request, error_msg)
             else:
-                messages.error(request, 'Credenciales inválidas.')
-    else:
-        form = LoginForms()
-    return render(request, 'home.html', {'form': form})
+                error_msg = 'Usuario o contraseña incorrectos.'
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False, 
+                        'message': error_msg
+                    })
+                else:
+                    messages.error(request, error_msg)
+        else:
+            error_msg = 'Por favor completa todos los campos correctamente.'
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False, 
+                    'message': error_msg
+                })
+            else:
+                messages.error(request, error_msg)
+    
+    return redirect('/home/')
 
 def user_register(request):
     if request.method == 'POST':

@@ -1,41 +1,11 @@
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar shadow">
-        <div class="container-fluid">
-            {% load static %}
-            <img src="{%static 'images/logo.jpeg'%}" alt="Logo PredictBuild" width="85px" height="65px" style="margin:0 70px 0 20px">
-         <!-- <a class="navbar-brand fw-bold fs-4 ms-2" href="\home">PREDICTBUILD</a> -->   
-            <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto custom-nav-items">
-                    <li class="nav-item">
-                        <a class="nav-link active position-relative fw-medium" href="/home/">INICIO</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative fw-medium" href="/home/#funciona">CÓMO FUNCIONA</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative fw-medium" href="\home\#casos">CASOS DE ÉXITO</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative fw-medium" href="\home\contacto">CONTACTO</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <div class="d-flex ">
-<button class="btn btn-dark px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal" style="margin-right: 150px;">INICIAR SESIÓN</button>                            <!--<button class="btn btn-outline-secondary px-4 shadow-sm" disabled>COMENZAR PRUEBA</button>-->
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    {% block content %}
-    {% endblock %}
-</body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PredictBuild</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar-brand {
             color: #0001a0 !important;
@@ -90,39 +60,156 @@
             color: #666 !important;
         }
     </style>
-
-<!-- Modal de Login -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:24px;">
-      <div class="modal-body p-0">
-        <div class="card p-4" style="border-radius:24px; background: linear-gradient(135deg, #0001a0 70%, #2a3cff 100%);">
-          <div class="text-center mb-3">
-            <img src="{% static 'images/logo.jpeg' %}" alt="Logo PredictBuild" width="70" class="mb-2 rounded shadow-sm">
-            <h3 class="text-white mb-2">Inicia Sesión</h3>
-            <p class="text-white-50 mb-0">Accede a tu cuenta PredictBuild</p>
-          </div>
-          <form method="POST" action="/home/login/" autocomplete="off">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label for="username" class="form-label text-white">Usuario o Correo electrónico</label>
-              <input type="text" class="form-control form-control-lg" id="username" name="username" required autocomplete="username">
+</head>
+<body>
+    <!-- AÑADE ESTA LÍNEA AL INICIO DEL BODY -->
+    {% load static %}
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar shadow">
+        <div class="container-fluid">
+            <img src="{% static 'images/logo.jpeg' %}" alt="Logo PredictBuild" width="85px" height="65px"
+                style="margin:0 70px 0 20px">
+            <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto custom-nav-items">
+                    <li class="nav-item">
+                        <a class="nav-link active position-relative fw-medium" href="/home/">INICIO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative fw-medium" href="/home/#funciona">CÓMO FUNCIONA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative fw-medium" href="\home\#casos">CASOS DE ÉXITO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative fw-medium" href="\home\contacto">CONTACTO</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div class="d-flex ">
+                            <button class="btn btn-dark px-4 shadow-sm" data-bs-toggle="modal"
+                                data-bs-target="#loginModal" style="margin-right: 150px;">INICIAR SESIÓN</button>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <div class="mb-3">
-              <label for="password" class="form-label text-white">Contraseña</label>
-              <input type="password" class="form-control form-control-lg" id="password" name="password" required autocomplete="current-password">
-            </div>
-            <div class="mb-3 d-flex justify-content-between align-items-center">
-              <a href="/home/password_reset/" class="small text-white-50 text-decoration-none">¿Olvidaste tu contraseña?</a>
-            </div>
-            <button type="submit" class="btn btn-light w-100 fw-bold py-2 mb-2" style="border-radius: 16px;">Iniciar Sesión</button>
-          </form>
-          <div class="text-center mt-2">
-            <span class="text-white-50">¿No tienes cuenta?</span>
-            <a href="/home/register/" class="text-white fw-bold text-decoration-underline">Regístrate</a>
-          </div>
         </div>
-      </div>
+    </nav>
+    
+    {% block content %}
+    {% endblock %}
+
+    <!-- Modal de Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:24px;">
+                <div class="modal-body p-0">
+                    <div class="card p-4"
+                        style="border-radius:24px; background: linear-gradient(135deg, #0001a0 70%, #2a3cff 100%);">
+                        <div class="text-center mb-3">
+                            <img src="{% static 'images/logo.jpeg' %}" alt="Logo PredictBuild" width="70"
+                                class="mb-2 rounded shadow-sm">
+                            <h3 class="text-white mb-2">Inicia Sesión</h3>
+                            <p class="text-white-50 mb-0">Accede a tu cuenta PredictBuild</p>
+                        </div>
+                        <form id="loginForm" method="POST" action="/home/login/" autocomplete="off">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="username" class="form-label text-white">Usuario o Correo electrónico</label>
+                                <input type="text" class="form-control form-control-lg" id="username" name="username"
+                                    value="{{ form.username.value|default_if_none:'' }}" required autocomplete="username">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label text-white">Contraseña</label>
+                                <input type="password" class="form-control form-control-lg" id="password" name="password"
+                                    required autocomplete="current-password">
+                            </div>
+
+                            <div id="loginError" class="alert alert-danger alert-dismissible fade show text-white d-none" role="alert"
+                                style="background:rgba(0,0,0,0.3);">
+                                <span id="errorMessage"></span>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+
+                            <div class="mb-3 d-flex justify-content-between align-items-center">
+                                <a href="/home/password_reset/" class="small text-white-50 text-decoration-none">¿Olvidaste
+                                    tu contraseña?</a>
+                            </div>
+                            <button type="submit" class="btn btn-light w-100 fw-bold py-2 mb-2"
+                                style="border-radius: 16px;">Iniciar Sesión</button>
+                        </form>
+
+                        <div class="text-center mt-2">
+                            <span class="text-white-50">¿No tienes cuenta?</span>
+                            <a href="/home/register/" class="text-white fw-bold text-decoration-underline">Regístrate</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            const loginError = document.getElementById('loginError');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Mostrar modal si hay mensajes de error del servidor
+            {% if messages %}
+                {% for message in messages %}
+                    errorMessage.textContent = '{{ message }}';
+                    loginError.classList.remove('d-none');
+                    loginModal.show();
+                {% endfor %}
+            {% endif %}
+            
+            // Manejar envío del formulario con AJAX
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Ocultar mensaje de error previo
+                loginError.classList.add('d-none');
+                
+                // Obtener datos del formulario
+                const formData = new FormData(loginForm);
+                
+                // Enviar solicitud AJAX
+                fetch(loginForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Si el login es exitoso, redirigir
+                        window.location.href = data.redirect_url;
+                    } else {
+                        // Mostrar mensaje de error y mantener el modal abierto
+                        errorMessage.textContent = data.message;
+                        loginError.classList.remove('d-none');
+                        loginModal.show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorMessage.textContent = 'Error de conexión. Inténtalo de nuevo.';
+                    loginError.classList.remove('d-none');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
