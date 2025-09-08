@@ -417,7 +417,7 @@ def user_login(request):
                 messages.error(request, 'Credenciales inválidas.')
     else:
         form = LoginForms()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'home.html', {'form': form})
 
 def user_register(request):
     if request.method == 'POST':
