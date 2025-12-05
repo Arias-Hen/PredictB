@@ -2,6 +2,7 @@ from django.forms import model_to_dict
 from django.shortcuts import render, redirect
 from .models import Users
 import csv
+from django.urls import reverse_lazy
 import json
 import os
 import pandas as pd
@@ -46,7 +47,6 @@ from django.conf import settings
 from .models import Vivienda, ImagenVivienda, Informe
 from django.core.files import File
 from .utils import generar_pdf
-from openai import OpenAI
 from fpdf import FPDF
 logger = logging.getLogger(__name__)
 
@@ -706,3 +706,7 @@ def generar_descripcion_vivienda(m2, hab, banos, ascensor):
         stream=False
     )
     return response.choices[0].message.content
+from django.contrib.auth.views import LogoutView
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('home:home')

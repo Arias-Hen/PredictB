@@ -1,3 +1,4 @@
+# home/signals.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import psycopg2
@@ -33,7 +34,7 @@ class UsersManager(BaseUserManager):
 class Users(AbstractBaseUser, PermissionsMixin):
     uniqueid = models.AutoField(primary_key=True)
     usuario = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
     empresa = models.CharField(max_length=100, default='Mi Empresa')
     nombre = models.CharField(max_length=100)
     estado = models.BooleanField(default=True)
@@ -59,7 +60,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     class Meta:
-        db_table = 'data"."users'
+        db_table = 'usuarios'
 
     def __str__(self):
         return self.usuario
@@ -87,7 +88,7 @@ class Valoracion(models.Model):
     precio_maximo = models.FloatField()
     precio_esperado_unico= models.FloatField()
     class Meta:
-        db_table = 'data"."ventas'
+        db_table = 'ventas'
 
 # models.py
 class PredictionModel:
@@ -213,4 +214,4 @@ class Informe(models.Model):
 
 
     class Meta:
-        db_table = 'data"."informes' 
+        db_table = 'informes' 
