@@ -1,0 +1,818 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .filter-section {
+        margin: 0 0 12px 0;
+        background: #f8f9fa;
+        padding: 8px 10px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+
+    .filter-row {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+        align-items: flex-end;
+        overflow-x: auto;
+        padding-bottom: 2px;
+    }
+
+    .filter-row::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .filter-row::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+
+    .filter-row::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 2px;
+    }
+
+    .filter-row::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Cada filtro */
+    .filter-col {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        min-width: 110px;
+        max-width: 130px;
+    }
+
+    .filter-col.fecha {
+        min-width: 100px;
+        max-width: 110px;
+    }
+
+    .filter-col.tipo {
+        min-width: 100px;
+        max-width: 110px;
+    }
+
+    .filter-col.precio {
+        min-width: 120px;
+        max-width: 140px;
+    }
+
+    .filter-col.boton {
+        min-width: 100px;
+        max-width: 110px;
+    }
+
+    .filter-section .form-label {
+        font-weight: 600;
+        font-size: 0.68rem;
+        color: #495057;
+        margin: 0 0 2px 0;
+        padding: 0;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .filter-section .form-control,
+    .filter-section .form-select {
+        font-size: 0.72rem;
+        padding: 0.12rem 0.25rem;
+        height: calc(1.3em + 0.24rem + 2px);
+        line-height: 1.3;
+        border: 1px solid #ced4da;
+        border-radius: 3px;
+        background-color: white;
+    }
+
+    .filter-section .form-select {
+        padding-right: 0.5rem;
+        background-image: none;
+    }
+
+    #limpiar-filtros {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+        font-weight: 600;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+        height: calc(1.3em + 0.4rem + 2px);
+        border-radius: 3px;
+        transition: all 0.2s;
+        text-transform: uppercase;
+    }
+
+    #limpiar-filtros:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    .form-label i {
+        display: none;
+    }
+
+    .filter-col select:disabled {
+        background-color: #e9ecef;
+        color: #6c757d;
+        border-color: #ced4da;
+    }
+
+    @media (max-width: 1400px) {
+        .filter-row {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block object-tools %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+{# Aquí renderizamos un formulario horizontal con filtros #}
+<div class="filter-section">
+    <div class="filter-row">
+        <!-- Fecha Desde -->
+        <div class="filter-col fecha">
+            <label class="form-label mb-1">Desde:</label>
+            <input type="date" class="form-control form-control-sm" id="desde">
+        </div>
+
+        <!-- Fecha Hasta -->
+        <div class="filter-col fecha">
+            <label class="form-label mb-1">Hasta:</label>
+            <input type="date" class="form-control form-control-sm" id="hasta">
+        </div>
+
+        <!-- Ciudad -->
+        <div class="filter-col">
+            <label class="form-label mb-1">Ciudad:</label>
+            <select id="ciudad_1" class="form-select form-select-sm"></select>
+        </div>
+
+        <!-- Distrito -->
+        <div class="filter-col">
+            <label class="form-label mb-1">Distrito:</label>
+            <select id="distrito_1" class="form-select form-control-sm" disabled>
+                <option value="">Seleccione ciudad</option>
+            </select>
+        </div>
+
+        <!-- Barrio -->
+        <div class="filter-col">
+            <label class="form-label mb-1">Barrio:</label>
+            <select id="barrio_1" class="form-select form-control-sm" disabled>
+                <option value="">Seleccione distrito</option>
+            </select>
+        </div>
+
+        <!-- Calle -->
+        <div class="filter-col">
+            <label class="form-label mb-1">Calle:</label>
+            <select id="calle_1" class="form-select form-control-sm" disabled>
+                <option value="">Seleccione barrio</option>
+            </select>
+        </div>
+
+        <!-- Tipo -->
+        <div class="filter-col tipo">
+            <label class="form-label mb-1">Tipo:</label>
+            <select id="tipo_1" class="form-select form-control-sm">
+                <option value="">Todos</option>
+                <option value="valoracion">Valoración</option>
+                <option value="registro">Registro</option>
+                <option value="informe">Informe</option>
+            </select>
+        </div>
+
+        <!-- Precio Desde -->
+        <div class="filter-col precio">
+            <label class="form-label mb-1">Precio Desde:</label>
+            <select id="precio-desde" class="form-select form-control-sm">
+                <option value="">Todos</option>
+                <option value="200000">200.000</option>
+                <option value="400000">400.000</option>
+                <option value="600000">600.000</option>
+            </select>
+        </div>
+
+        <!-- Precio Hasta -->
+        <div class="filter-col precio">
+            <label class="form-label mb-1">Precio Hasta:</label>
+            <select id="precio-hasta" class="form-select form-control-sm">
+                <option value="">Todos</option>
+                <option value="1000000">1.000.000</option>
+                <option value="2000000">2.000.000</option>
+                <option value="3000000">3.000.000</option>
+            </select>
+        </div>
+
+        <!-- Botón Limpiar -->
+        <div class="filter-col boton">
+            <button type="button" id="limpiar-filtros" class="btn btn-sm w-100">
+                Limpiar
+            </button>
+        </div>
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+    console.log('=== INICIALIZANDO FILTROS VALORACIONES ===');
+
+    const optionsJson = '{{ options_json|escapejs }}';
+    console.log('Datos de ciudades recibidos:', optionsJson);
+
+    let ciudadesData = [];
+    try {
+        ciudadesData = JSON.parse(optionsJson || '[]');
+        console.log('Ciudades parseadas:', ciudadesData);
+    } catch (e) {
+        console.error('Error parseando ciudades:', e);
+    }
+
+    const currentPath = window.location.pathname;
+    const baseUrl = currentPath.split('/change_list/')[0];
+    console.log('URL base para AJAX:', baseUrl);
+
+
+    function obtenerTablaDjangoAdmin() {
+        console.log('=== BUSCANDO TABLA DE DJANGO ADMIN ===');
+
+        let tabla = document.querySelector('.results table');
+
+        if (!tabla) {
+            tabla = document.querySelector('#content-main table');
+        }
+
+        if (!tabla) {
+            const todasLasTablas = document.querySelectorAll('table');
+            for (let t of todasLasTablas) {
+                if (!t.closest('.filter-section')) {
+                    tabla = t;
+                    break;
+                }
+            }
+        }
+
+        if (tabla) {
+            console.log('✅ Tabla de Django Admin encontrada:', {
+                id: tabla.id || 'Sin ID',
+                clases: tabla.className,
+                filas: tabla.querySelectorAll('tbody tr').length
+            });
+            return tabla;
+        }
+
+        console.error('❌ No se encontró ninguna tabla de Django Admin');
+        return null;
+    }
+
+    function debugTablaDjango() {
+        const tabla = obtenerTablaDjangoAdmin();
+        if (!tabla) {
+            console.log('No hay tabla para depurar');
+            return;
+        }
+
+        console.log('=== 🎯 ESTRUCTURA DE LA TABLA DJANGO ===');
+
+        // 1. Headers (columnas)
+        const headers = tabla.querySelectorAll('thead th');
+        console.log(`\n📋 HEADERS (${headers.length} columnas):`);
+        headers.forEach((header, index) => {
+            const texto = header.textContent?.trim() || '';
+            console.log(`  ${index}. "${texto}"`);
+        });
+
+        const filas = tabla.querySelectorAll('tbody tr');
+        console.log(`\n📊 FILAS DE DATOS (${filas.length} filas):`);
+
+        if (filas.length > 0) {
+            const primeraFila = filas[0];
+            const celdas = primeraFila.querySelectorAll('td');
+
+            console.log(`\n📍 PRIMERA FILA (${celdas.length} celdas):`);
+            celdas.forEach((celda, index) => {
+                const texto = celda.textContent?.trim();
+                console.log(`  ${index}. "${texto}"`);
+            });
+        }
+
+        return tabla;
+    }
+
+    function cargarCiudades() {
+        const selectCiudad = document.getElementById('ciudad_1');
+
+        if (!selectCiudad) {
+            console.error('Select ciudad_1 no encontrado');
+            return;
+        }
+
+        selectCiudad.innerHTML = '<option value="">Todos</option>';
+
+        if (ciudadesData.length === 0) {
+            selectCiudad.innerHTML += '<option value="">No hay ciudades disponibles</option>';
+            return;
+        }
+
+        ciudadesData.forEach(ciudad => {
+            const option = document.createElement('option');
+            option.value = ciudad.id;
+            option.textContent = ciudad.name;
+            selectCiudad.appendChild(option);
+        });
+
+        selectCiudad.disabled = false;
+        console.log('Ciudades cargadas:', ciudadesData.length);
+    }
+
+    function cargarDistritos(ciudad) {
+        const selectDistrito = document.getElementById('distrito_1');
+        const selectBarrio = document.getElementById('barrio_1');
+        const selectCalle = document.getElementById('calle_1');
+
+        if (!ciudad) {
+            selectDistrito.innerHTML = '<option value="">Todos</option>';
+            selectDistrito.disabled = true;
+            selectBarrio.innerHTML = '<option value="">Todos</option>';
+            selectBarrio.disabled = true;
+            selectCalle.innerHTML = '<option value="">Todos</option>';
+            selectCalle.disabled = true;
+            return;
+        }
+
+        selectDistrito.innerHTML = '<option value="">Cargando distritos...</option>';
+        selectDistrito.disabled = false;
+        selectBarrio.innerHTML = '<option value="">Todos</option>';
+        selectBarrio.disabled = true;
+        selectCalle.innerHTML = '<option value="">Todos</option>';
+        selectCalle.disabled = true;
+
+        fetch(`/home/get_distritos/${ciudad}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Distritos recibidos:', data);
+                selectDistrito.innerHTML = '<option value="">Todos</option>';
+
+                if (data.distritos && data.distritos.length > 0) {
+                    data.distritos.forEach(distrito => {
+                        const option = document.createElement('option');
+                        option.value = distrito.id;
+                        option.textContent = distrito.name;
+                        selectDistrito.appendChild(option);
+                    });
+                } else {
+                    selectDistrito.innerHTML = '<option value="">No hay distritos</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar distritos:', error);
+                selectDistrito.innerHTML = '<option value="">Error al cargar</option>';
+            });
+    }
+
+    function cargarBarrios(distrito) {
+        const selectBarrio = document.getElementById('barrio_1');
+        const selectCalle = document.getElementById('calle_1');
+
+        if (!distrito) {
+            selectBarrio.innerHTML = '<option value="">Todos</option>';
+            selectBarrio.disabled = true;
+            selectCalle.innerHTML = '<option value="">Todos</option>';
+            selectCalle.disabled = true;
+            return;
+        }
+
+        selectBarrio.innerHTML = '<option value="">Cargando barrios...</option>';
+        selectBarrio.disabled = false;
+        selectCalle.innerHTML = '<option value="">Todos</option>';
+        selectCalle.disabled = true;
+
+        fetch(`/home/get_barrios/${distrito}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Barrios recibidos:', data);
+                selectBarrio.innerHTML = '<option value="">Todos</option>';
+
+                if (data.barrio && data.barrio.length > 0) {
+                    data.barrio.forEach(barrio => {
+                        const option = document.createElement('option');
+                        option.value = barrio.id;
+                        option.textContent = barrio.name;
+                        selectBarrio.appendChild(option);
+                    });
+                } else {
+                    selectBarrio.innerHTML = '<option value="">No hay barrios</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar barrios:', error);
+                selectBarrio.innerHTML = '<option value="">Error al cargar</option>';
+            });
+    }
+
+    function cargarCalles(barrio) {
+        const selectCalle = document.getElementById('calle_1');
+
+        if (!barrio) {
+            selectCalle.innerHTML = '<option value="">Todos</option>';
+            selectCalle.disabled = true;
+            return;
+        }
+
+        selectCalle.innerHTML = '<option value="">Cargando calles...</option>';
+        selectCalle.disabled = false;
+
+        fetch(`/home/get_calles/${barrio}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Calles recibidas:', data);
+                selectCalle.innerHTML = '<option value="">Todos</option>';
+
+                if (data.calle && data.calle.length > 0) {
+                    data.calle.forEach(calle => {
+                        const option = document.createElement('option');
+                        option.value = calle.id;
+                        option.textContent = calle.name;
+                        selectCalle.appendChild(option);
+                    });
+                } else {
+                    selectCalle.innerHTML = '<option value="">No hay calles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar calles:', error);
+                selectCalle.innerHTML = '<option value="">Error al cargar</option>';
+            });
+    }
+
+    function filtrarTablaDjango() {
+        console.log('=== FILTRANDO TABLA DJANGO ADMIN ===');
+
+        const desde = document.getElementById('desde')?.value || '';
+        const hasta = document.getElementById('hasta')?.value || '';
+        const tipo = document.getElementById('tipo_1')?.value || '';
+        const precioDesde = parseFloat(document.getElementById('precio-desde')?.value) || 0;
+        const precioHasta = parseFloat(document.getElementById('precio-hasta')?.value) || Infinity;
+        const ciudad = document.getElementById('ciudad_1')?.value || '';
+        const distrito = document.getElementById('distrito_1')?.value || '';
+        const barrio = document.getElementById('barrio_1')?.value || '';
+        const calle = document.getElementById('calle_1')?.value || '';
+
+        console.log('Filtros aplicados:', {
+            desde, hasta, tipo, precioDesde, precioHasta,
+            ciudad, distrito, barrio, calle
+        });
+
+        const tabla = obtenerTablaDjangoAdmin();
+        if (!tabla) {
+            console.error('No se pudo encontrar la tabla de Django Admin');
+            return;
+        }
+
+        const tbody = tabla.querySelector('tbody');
+        if (!tbody) {
+            console.error('No se encontró tbody en la tabla');
+            return;
+        }
+
+        const filas = tbody.querySelectorAll('tr');
+        console.log(`Filas a filtrar: ${filas.length}`);
+
+        if (filas.length === 0) {
+            console.log('No hay filas para filtrar');
+            return;
+        }
+
+
+        const primeraFila = filas[0];
+        const celdasPrimera = primeraFila.querySelectorAll('td');
+        console.log(`Estructura detectada: ${celdasPrimera.length} columnas por fila`);
+
+
+        const INDICES = {
+            MODO: 2,        // 'modo' 
+            CIUDAD: 3,      // 'ciudad'
+            DISTRITO: 4,    // 'distrito'
+            BARRIO: 5,      // 'barrio'
+            CALLE: 6,       // 'calle'
+            FECHA: 17,      // 'fecha_guardado'
+            PRECIO_MIN: 18, // 'precio_minimo'
+            PRECIO_ESP: 19, // 'precio_esperado'
+            PRECIO_MAX: 20, // 'precio_maximo'
+            PRECIO_UNICO: 21 // 'precio_esperado_unico'
+        };
+
+        console.log('Índices corregidos para tabla con checkbox:', INDICES);
+
+        let visibleCount = 0;
+
+        filas.forEach((fila, indexFila) => {
+            let mostrar = true;
+            const celdas = fila.querySelectorAll('td');
+
+            if (celdas.length < INDICES.FECHA) {
+                console.warn(`Fila ${indexFila} tiene menos celdas (${celdas.length}) de las esperadas (${INDICES.FECHA})`);
+                fila.style.display = 'none';
+                return;
+            }
+
+            if ((desde || hasta) && mostrar) {
+                const celdaFecha = celdas[INDICES.FECHA];
+                if (celdaFecha) {
+                    const textoFecha = celdaFecha.textContent?.trim() || '';
+                    console.log(`Fila ${indexFila} - Fecha: "${textoFecha}"`);
+
+                    if (textoFecha) {
+                        let fechaFila = null;
+
+                        const fechaMatch = textoFecha.match(/(\w+)\.?\s+(\d+),\s+(\d{4}),/);
+                        if (fechaMatch) {
+                            const [_, mesTexto, dia, anio] = fechaMatch;
+                            const meses = {
+                                'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                                'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+                            };
+
+                            const mesNum = meses[mesTexto.substring(0, 3)] || 0;
+                            fechaFila = new Date(anio, mesNum, parseInt(dia));
+
+                            console.log(`Fecha parseada: ${fechaFila.toISOString().split('T')[0]}`);
+                        }
+
+                        if (fechaFila) {
+                            if (desde) {
+                                const fechaDesde = new Date(desde);
+                                fechaDesde.setHours(0, 0, 0, 0);
+                                if (fechaFila < fechaDesde) {
+                                    console.log(`❌ Fecha ${fechaFila.toISOString().split('T')[0]} es menor que ${desde}`);
+                                    mostrar = false;
+                                }
+                            }
+
+                            if (hasta) {
+                                const fechaHasta = new Date(hasta);
+                                fechaHasta.setHours(23, 59, 59, 999);
+                                if (fechaFila > fechaHasta) {
+                                    console.log(`❌ Fecha ${fechaFila.toISOString().split('T')[0]} es mayor que ${hasta}`);
+                                    mostrar = false;
+                                }
+                            }
+                        } else {
+                            console.log(`⚠️ No se pudo parsear fecha: "${textoFecha}"`);
+                        }
+                    }
+                }
+            }
+
+            if (tipo && mostrar) {
+                const celdaTipo = celdas[INDICES.MODO];
+                if (celdaTipo) {
+                    const textoTipo = celdaTipo.textContent?.trim().toLowerCase() || '';
+                    if (textoTipo !== tipo.toLowerCase()) {
+                        console.log(`❌ Tipo "${textoTipo}" no coincide con "${tipo}"`);
+                        mostrar = false;
+                    }
+                }
+            }
+            if (ciudad && mostrar) {
+                const celdaCiudad = celdas[INDICES.CIUDAD];
+                if (celdaCiudad) {
+                    const textoCiudad = celdaCiudad.textContent?.trim() || '';
+                    if (textoCiudad !== ciudad) {
+                        console.log(`❌ Ciudad "${textoCiudad}" no coincide con "${ciudad}"`);
+                        mostrar = false;
+                    }
+                }
+            }
+
+            if (distrito && mostrar) {
+                const celdaDistrito = celdas[INDICES.DISTRITO];
+                if (celdaDistrito) {
+                    const textoDistrito = celdaDistrito.textContent?.trim() || '';
+                    if (textoDistrito !== distrito) {
+                        console.log(`❌ Distrito "${textoDistrito}" no coincide con "${distrito}"`);
+                        mostrar = false;
+                    }
+                }
+            }
+            if (barrio && mostrar) {
+                const celdaBarrio = celdas[INDICES.BARRIO];
+                if (celdaBarrio) {
+                    const textoBarrio = celdaBarrio.textContent?.trim() || '';
+                    if (textoBarrio !== barrio) {
+                        console.log(`❌ Barrio "${textoBarrio}" no coincide con "${barrio}"`);
+                        mostrar = false;
+                    }
+                }
+            }
+
+            if (calle && mostrar) {
+                const celdaCalle = celdas[INDICES.CALLE];
+                if (celdaCalle) {
+                    const textoCalle = celdaCalle.textContent?.trim() || '';
+                    if (textoCalle !== calle) {
+                        console.log(`❌ Calle "${textoCalle}" no coincide con "${calle}"`);
+                        mostrar = false;
+                    }
+                }
+            }
+
+            if ((precioDesde > 0 || precioHasta < Infinity) && mostrar) {
+                let precioEncontrado = false;
+                let precioValor = 0;
+
+                const preciosIndices = [INDICES.PRECIO_MIN, INDICES.PRECIO_ESP, INDICES.PRECIO_MAX, INDICES.PRECIO_UNICO];
+
+                for (const idx of preciosIndices) {
+                    if (idx < celdas.length) {
+                        const celdaPrecio = celdas[idx];
+                        if (celdaPrecio) {
+                            const textoPrecio = celdaPrecio.textContent?.trim() || '';
+                            if (textoPrecio) {
+                                const textoLimpio = textoPrecio.replace(/\./g, '').replace(',', '.');
+                                const precio = parseFloat(textoLimpio);
+
+                                if (!isNaN(precio) && precio > 0) {
+                                    precioValor = precio;
+                                    precioEncontrado = true;
+                                    console.log(`💰 Precio encontrado en índice ${idx}: ${precioValor}`);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (precioEncontrado) {
+                    if (precioValor < precioDesde || precioValor > precioHasta) {
+                        console.log(`❌ Precio ${precioValor} fuera de rango [${precioDesde}, ${precioHasta}]`);
+                        mostrar = false;
+                    }
+                }
+            }
+
+            if (mostrar) {
+                fila.style.display = '';
+                visibleCount++;
+                console.log(`✅ Fila ${indexFila} MOSTRADA`);
+            } else {
+                fila.style.display = 'none';
+                console.log(`❌ Fila ${indexFila} OCULTADA`);
+            }
+        });
+
+        console.log(`✅ Filtrado completado: ${visibleCount} de ${filas.length} filas visibles`);
+
+        if (visibleCount === 0) {
+            console.log('⚠️ No hay resultados que coincidan con los filtros');
+
+            const mensajeNoResultados = document.getElementById('mensaje-no-resultados');
+            if (!mensajeNoResultados) {
+                const mensaje = document.createElement('div');
+                mensaje.id = 'mensaje-no-resultados';
+                mensaje.className = 'alert alert-info mt-3';
+                mensaje.innerHTML = '<strong>Info:</strong> No hay resultados que coincidan con los filtros aplicados.';
+
+                const contenedor = document.querySelector('#content-main .module');
+                if (contenedor) {
+                    contenedor.insertBefore(mensaje, contenedor.firstChild);
+                }
+            }
+        } else {
+            const mensajeNoResultados = document.getElementById('mensaje-no-resultados');
+            if (mensajeNoResultados) {
+                mensajeNoResultados.remove();
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM cargado - Inicializando filtros Django Admin');
+
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoy.getDate()).padStart(2, '0');
+
+        const fechaHoy = `${yyyy}-${mm}-${dd}`;
+        const fechaEnero = `${yyyy}-01-01`;
+
+        const desdeInput = document.getElementById('desde');
+        const hastaInput = document.getElementById('hasta');
+
+        if (desdeInput) {
+            desdeInput.value = fechaEnero;
+            desdeInput.addEventListener('change', filtrarTablaDjango);
+        }
+
+        if (hastaInput) {
+            hastaInput.value = fechaHoy;
+            hastaInput.addEventListener('change', filtrarTablaDjango);
+        }
+
+        cargarCiudades();
+
+        const ciudadSelect = document.getElementById('ciudad_1');
+        if (ciudadSelect) {
+            ciudadSelect.addEventListener('change', function () {
+                console.log('Ciudad seleccionada:', this.value);
+                cargarDistritos(this.value);
+                setTimeout(filtrarTablaDjango, 300);
+            });
+        }
+
+        const distritoSelect = document.getElementById('distrito_1');
+        if (distritoSelect) {
+            distritoSelect.addEventListener('change', function () {
+                console.log('Distrito seleccionado:', this.value);
+                cargarBarrios(this.value);
+                setTimeout(filtrarTablaDjango, 300);
+            });
+        }
+
+        const barrioSelect = document.getElementById('barrio_1');
+        if (barrioSelect) {
+            barrioSelect.addEventListener('change', function () {
+                console.log('Barrio seleccionado:', this.value);
+                cargarCalles(this.value);
+                setTimeout(filtrarTablaDjango, 300);
+            });
+        }
+
+        const tipoSelect = document.getElementById('tipo_1');
+        const precioDesdeSelect = document.getElementById('precio-desde');
+        const precioHastaSelect = document.getElementById('precio-hasta');
+        const calleSelect = document.getElementById('calle_1');
+
+        if (tipoSelect) tipoSelect.addEventListener('change', filtrarTablaDjango);
+        if (precioDesdeSelect) precioDesdeSelect.addEventListener('change', filtrarTablaDjango);
+        if (precioHastaSelect) precioHastaSelect.addEventListener('change', filtrarTablaDjango);
+        if (calleSelect) calleSelect.addEventListener('change', filtrarTablaDjango);
+
+        document.getElementById('limpiar-filtros')?.addEventListener('click', function () {
+            console.log('Limpiando filtros...');
+
+            if (desdeInput) desdeInput.value = fechaEnero;
+            if (hastaInput) hastaInput.value = fechaHoy;
+
+            document.getElementById('ciudad_1').value = '';
+            document.getElementById('distrito_1').innerHTML = '<option value="">Seleccione ciudad primero</option>';
+            document.getElementById('distrito_1').disabled = true;
+            document.getElementById('barrio_1').innerHTML = '<option value="">Seleccione distrito primero</option>';
+            document.getElementById('barrio_1').disabled = true;
+            document.getElementById('calle_1').innerHTML = '<option value="">Seleccione barrio primero</option>';
+            document.getElementById('calle_1').disabled = true;
+            document.getElementById('tipo_1').value = '';
+            document.getElementById('precio-desde').value = '';
+            document.getElementById('precio-hasta').value = '';
+
+            cargarCiudades();
+
+            setTimeout(filtrarTablaDjango, 500);
+
+            console.log('Filtros limpiados');
+        });
+
+        setTimeout(debugTablaDjango, 1000);
+
+        setTimeout(() => {
+            console.log('Filtrado inicial...');
+            filtrarTablaDjango();
+        }, 1500);
+
+        console.log('✅ Filtros Django Admin inicializados');
+    });
+</script>
+{% endblock %}
