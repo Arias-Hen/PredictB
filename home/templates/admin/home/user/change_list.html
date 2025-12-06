@@ -1,0 +1,582 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .user-filter-section {
+        margin: 0 0 15px 0;
+        background: #ffffff;
+        padding: 10px 12px;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .user-filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: flex-end;
+    }
+    
+    .user-filter-col {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        min-width: 140px;
+    }
+    
+    .user-filter-col.small {
+        min-width: 120px;
+    }
+    
+    .user-filter-col.xsmall {
+        min-width: 100px;
+    }
+    
+    .user-filter-col.medium {
+        min-width: 160px;
+    }
+    
+    .user-filter-section .form-label {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #004085;
+        margin: 0 0 3px 0;
+        white-space: nowrap;
+    }
+    
+    .user-filter-section .form-control,
+    .user-filter-section .form-select {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.4rem;
+        height: calc(1.4em + 0.5rem);
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    
+    #search-usuario {
+        padding-left: 32px;
+        background-repeat: no-repeat;
+        background-position: 8px center;
+        background-size: 12px;
+    }
+    
+    #search-email {
+        padding-left: 32px;
+        background-repeat: no-repeat;
+        background-position: 8px center;
+        background-size: 12px;
+    }
+    
+    #search-nombre {
+        padding-left: 32px;
+        background-repeat: no-repeat;
+        background-position: 8px center;
+        background-size: 12px;
+    }
+    
+    .search-field:focus {
+        border-color: #004085;
+        box-shadow: 0 0 0 0.2rem rgba(0, 64, 133, 0.25);
+    }
+    
+    #limpiar-filtros-user {
+        background-color: #004085;
+        border-color: #004085;
+        color: white;
+        font-weight: 600;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        height: calc(1.4em + 0.5rem);
+        border-radius: 4px;
+    }
+    
+    #limpiar-filtros-user:hover {
+        background-color: #002752;
+        border-color: #002752;
+    }
+    
+    #buscar-avanzado {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+        font-weight: 600;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        height: calc(1.4em + 0.5rem);
+        border-radius: 4px;
+    }
+    
+    #buscar-avanzado:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    
+    .delete-action-container {
+        margin: 10px 0 20px 0;
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    #fixed-delete-btn {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    #fixed-delete-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+    }
+    
+    #fixed-delete-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .selected-counter {
+        background: #007bff;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    
+    .delete-info {
+        color: #6c757d;
+        font-size: 13px;
+        font-style: italic;
+    }
+    
+    @media (max-width: 1400px) {
+        .user-filter-row {
+            gap: 6px;
+        }
+        .user-filter-col {
+            min-width: 130px;
+        }
+        .user-filter-col.small {
+            min-width: 110px;
+        }
+        .user-filter-col.xsmall {
+            min-width: 90px;
+        }
+        
+        .delete-action-container {
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- FILTROS PARA USUARIOS-->
+<div class="user-filter-section">
+    <div class="user-filter-row">
+        <!-- Búsqueda por USUARIO -->
+        <div class="user-filter-col medium">
+            <label class="form-label mb-1">Usuario:</label>
+            <input type="text" class="form-control search-field" id="search-usuario" 
+                   placeholder="Nombre de usuario...">
+        </div>
+        
+        <!-- Búsqueda por EMAIL -->
+        <div class="user-filter-col medium">
+            <label class="form-label mb-1">Email:</label>
+            <input type="text" class="form-control search-field" id="search-email" 
+                   placeholder="Correo electrónico...">
+        </div>
+        
+        <!-- Búsqueda por NOMBRE -->
+        <div class="user-filter-col medium">
+            <label class="form-label mb-1">Nombre:</label>
+            <input type="text" class="form-control search-field" id="search-nombre" 
+                   placeholder="Nombre completo...">
+        </div>
+        
+        <!-- Filtro por empresa -->
+        <div class="user-filter-col">
+            <label class="form-label mb-1">Empresa:</label>
+            <select id="empresa-filter" class="form-select">
+                <option value="">Todas</option>
+                {% if empresas_json %}
+                <script>
+                    const empresasData = JSON.parse('{{ empresas_json|escapejs }}');
+                    empresasData.forEach(empresa => {
+                        document.write(`<option value="${empresa.id}">${empresa.name}</option>`);
+                    });
+                </script>
+                {% endif %}
+            </select>
+        </div>
+        
+        <!-- Filtro por estado -->
+        <div class="user-filter-col small">
+            <label class="form-label mb-1">Estado:</label>
+            <select id="estado-filter" class="form-select">
+                <option value="">Todos</option>
+                {% if estados_json %}
+                <script>
+                    const estadosData = JSON.parse('{{ estados_json|escapejs }}');
+                    estadosData.forEach(estado => {
+                        document.write(`<option value="${estado.id}">${estado.name}</option>`);
+                    });
+                </script>
+                {% endif %}
+            </select>
+        </div>
+        
+        <!-- Filtro por activo/inactivo -->
+        <div class="user-filter-col xsmall">
+            <label class="form-label mb-1">Activo:</label>
+            <select id="activo-filter" class="form-select">
+                <option value="">Todos</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        
+        <!-- Botón búsqueda avanzada (opcional) -->
+        <div class="user-filter-col xsmall">
+            <button type="button" id="buscar-avanzado" class="btn btn-sm w-100">
+                Buscar
+            </button>
+        </div>
+        
+        <!-- Botón limpiar -->
+        <div class="user-filter-col xsmall">
+            <button type="button" id="limpiar-filtros-user" class="btn btn-sm w-100">
+                Limpiar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENEDOR PARA EL BOTÓN DE ELIMINAR -->
+<div class="delete-action-container">
+    <div style="display: flex; align-items: center;">
+        <button id="fixed-delete-btn" type="button" disabled>
+            <span style="font-size: 16px;">🗑️</span>
+            <span id="delete-btn-text">Eliminar seleccionados</span>
+            <span id="selected-counter" class="selected-counter" style="display: none;">0</span>
+        </button>
+        <span class="delete-info" style="margin-left: 15px;">
+            Selecciona usuarios marcando los checkboxes a la izquierda
+        </span>
+    </div>
+    
+    <!-- Contador adicional -->
+    <div id="selection-stats" style="font-size: 13px; color: #495057;">
+        <span id="current-selection">0</span> de <span id="total-users">{{ cl.result_count }}</span> usuarios seleccionados
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+    // FUNCIÓN PARA FILTRAR USUARIOS - VERSIÓN MEJORADA
+    function filtrarUsuarios() {
+        const usuario = document.getElementById('search-usuario').value.toLowerCase();
+        const email = document.getElementById('search-email').value.toLowerCase();
+        const nombre = document.getElementById('search-nombre').value.toLowerCase();
+        const empresa = document.getElementById('empresa-filter').value;
+        const estado = document.getElementById('estado-filter').value;
+        const activo = document.getElementById('activo-filter').value;
+        
+        const tabla = document.querySelector('#result_list');
+        if (!tabla) return;
+        
+        const filas = tabla.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            let mostrar = true;
+            const celdas = fila.querySelectorAll('td');
+            
+            // Ajusta estos índices según tu list_display:
+            // list_display = ('uniqueid', 'usuario', 'email', 'empresa', 'nombre', 'estado', 'is_active', 'is_staff')
+            const INDICES = {
+                USUARIO: 1,    // 'usuario'
+                EMAIL: 2,      // 'email'  
+                EMPRESA: 3,    // 'empresa'
+                NOMBRE: 4,     // 'nombre'
+                ESTADO: 5,     // 'estado'
+                ACTIVO: 6      // 'is_active'
+            };
+            
+            // 1. Filtro por USUARIO (índice 1)
+            if (usuario && mostrar) {
+                const celdaUsuario = celdas[INDICES.USUARIO];
+                if (celdaUsuario) {
+                    const textoUsuario = celdaUsuario.textContent.toLowerCase().trim();
+                    if (!textoUsuario.includes(usuario)) {
+                        mostrar = false;
+                    }
+                } else {
+                    mostrar = false;
+                }
+            }
+            
+            // 2. Filtro por EMAIL (índice 2)
+            if (email && mostrar) {
+                const celdaEmail = celdas[INDICES.EMAIL];
+                if (celdaEmail) {
+                    const textoEmail = celdaEmail.textContent.toLowerCase().trim();
+                    if (!textoEmail.includes(email)) {
+                        mostrar = false;
+                    }
+                } else {
+                    mostrar = false;
+                }
+            }
+            
+            // 3. Filtro por NOMBRE (índice 4)
+            if (nombre && mostrar) {
+                const celdaNombre = celdas[INDICES.NOMBRE];
+                if (celdaNombre) {
+                    const textoNombre = celdaNombre.textContent.toLowerCase().trim();
+                    if (!textoNombre.includes(nombre)) {
+                        mostrar = false;
+                    }
+                } else {
+                    mostrar = false;
+                }
+            }
+            
+            // 4. Filtro por EMPRESA (índice 3)
+            if (empresa && mostrar) {
+                const celdaEmpresa = celdas[INDICES.EMPRESA];
+                if (celdaEmpresa) {
+                    const textoEmpresa = celdaEmpresa.textContent.trim();
+                    if (textoEmpresa !== empresa) {
+                        mostrar = false;
+                    }
+                } else {
+                    mostrar = false;
+                }
+            }
+            
+            // 5. Filtro por ESTADO (índice 5)
+            if (estado && mostrar) {
+                const celdaEstado = celdas[INDICES.ESTADO];
+                if (celdaEstado) {
+                    const textoEstado = celdaEstado.textContent.trim();
+                    if (textoEstado !== estado) {
+                        mostrar = false;
+                    }
+                } else {
+                    mostrar = false;
+                }
+            }
+            
+            // 6. Filtro por ACTIVO (índice 6)
+            if (activo && mostrar) {
+                const celdaActivo = celdas[INDICES.ACTIVO];
+                if (celdaActivo) {
+                    const textoActivo = celdaActivo.textContent.trim();
+                    if ((activo === 'true' && textoActivo !== 'True') || 
+                        (activo === 'false' && textoActivo !== 'False')) {
+                        mostrar = false;
+                    }
+                } else {
+                    mostrar = false;
+                }
+            }
+            
+            fila.style.display = mostrar ? '' : 'none';
+        });
+        
+        // Actualizar contador total después de filtrar
+        updateDeleteButton();
+    }
+    
+    // FUNCIÓN PARA ACTUALIZAR EL BOTÓN DE ELIMINAR
+    function updateDeleteButton() {
+        const deleteBtn = document.getElementById('fixed-delete-btn');
+        const selectedCounter = document.getElementById('selected-counter');
+        const deleteBtnText = document.getElementById('delete-btn-text');
+        const currentSelection = document.getElementById('current-selection');
+        const actionSelect = document.querySelector('select[name="action"]');
+        
+        // Obtener todos los checkboxes visibles
+        const visibleRows = Array.from(document.querySelectorAll('#result_list tbody tr'))
+            .filter(row => row.style.display !== 'none');
+        
+        const visibleCheckboxes = visibleRows.map(row => 
+            row.querySelector('input[type="checkbox"][name="_selected_action"]')
+        ).filter(cb => cb !== null);
+        
+        const selectedCheckboxes = visibleCheckboxes.filter(cb => cb.checked);
+        const selectedCount = selectedCheckboxes.length;
+        
+        // Actualizar botón
+        if (selectedCount > 0) {
+            deleteBtn.disabled = false;
+            selectedCounter.style.display = 'inline-block';
+            selectedCounter.textContent = selectedCount;
+            deleteBtnText.textContent = `Eliminar ${selectedCount} usuario(s)`;
+        } else {
+            deleteBtn.disabled = true;
+            selectedCounter.style.display = 'none';
+            deleteBtnText.textContent = 'Eliminar seleccionados';
+        }
+        
+        // Actualizar estadísticas
+        if (currentSelection) {
+            currentSelection.textContent = selectedCount;
+        }
+        
+        // Actualizar el selector de acciones si existe
+        if (actionSelect && actionSelect.options.length > 0) {
+            // Buscar la opción de eliminar usuarios
+            const deleteOption = Array.from(actionSelect.options)
+                .find(opt => opt.value === 'delete_selected_users');
+            
+            if (deleteOption) {
+                // Actualizar el texto si hay usuarios seleccionados
+                if (selectedCount > 0) {
+                    deleteOption.textContent = `🗑️ Eliminar ${selectedCount} usuario(s) seleccionado(s)`;
+                } else {
+                    deleteOption.textContent = '🗑️ Eliminar usuarios seleccionados';
+                }
+            }
+        }
+    }
+    
+    // FUNCIÓN PARA MANEJAR LA ELIMINACIÓN
+    function handleDelete() {
+        const deleteBtn = document.getElementById('fixed-delete-btn');
+        const actionSelect = document.querySelector('select[name="action"]');
+        
+        if (deleteBtn.disabled) return;
+        
+        // Obtener todos los checkboxes seleccionados
+        const selectedCheckboxes = Array.from(
+            document.querySelectorAll('input[type="checkbox"][name="_selected_action"]:checked')
+        );
+        const selectedCount = selectedCheckboxes.length;
+        
+        if (selectedCount === 0) return;
+        
+        if (confirm(`¿Estás seguro de eliminar ${selectedCount} usuario(s) seleccionado(s)?`)) {
+            if (actionSelect) {
+                const deleteOption = Array.from(actionSelect.options)
+                    .find(opt => opt.value === 'delete_selected_users');
+                
+                if (deleteOption) {
+                    actionSelect.value = 'delete_selected_users';
+                    
+                    const form = document.querySelector('#changelist-form');
+                    if (form) {
+                        form.submit();
+                    }
+                } else {
+                    alert('Error: No se encontró la acción de eliminar usuarios');
+                }
+            } else {
+                alert('Error: No se encontró el selector de acciones');
+            }
+        }
+    }
+    
+    // EVENT LISTENERS
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar eventos de búsqueda en tiempo real
+        document.getElementById('search-usuario').addEventListener('input', filtrarUsuarios);
+        document.getElementById('search-email').addEventListener('input', filtrarUsuarios);
+        document.getElementById('search-nombre').addEventListener('input', filtrarUsuarios);
+        document.getElementById('empresa-filter').addEventListener('change', filtrarUsuarios);
+        document.getElementById('estado-filter').addEventListener('change', filtrarUsuarios);
+        document.getElementById('activo-filter').addEventListener('change', filtrarUsuarios);
+        
+        // Botón búsqueda avanzada (opcional)
+        document.getElementById('buscar-avanzado').addEventListener('click', filtrarUsuarios);
+        
+        // Botón limpiar
+        document.getElementById('limpiar-filtros-user').addEventListener('click', function() {
+            document.getElementById('search-usuario').value = '';
+            document.getElementById('search-email').value = '';
+            document.getElementById('search-nombre').value = '';
+            document.getElementById('empresa-filter').value = '';
+            document.getElementById('estado-filter').value = '';
+            document.getElementById('activo-filter').value = '';
+            
+            // Mostrar todas las filas
+            const tabla = document.querySelector('#result_list');
+            if (tabla) {
+                const filas = tabla.querySelectorAll('tbody tr');
+                filas.forEach(fila => fila.style.display = '');
+            }
+            
+            updateDeleteButton();
+        });
+        
+        // Configurar evento para el botón de eliminar
+        document.getElementById('fixed-delete-btn').addEventListener('click', handleDelete);
+        
+        // Configurar eventos para checkboxes
+        function setupCheckboxListeners() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name="_selected_action"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateDeleteButton);
+            });
+            
+            // Checkbox "seleccionar todos"
+            const selectAll = document.querySelector('#action-toggle');
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    setTimeout(updateDeleteButton, 100); // Pequeño delay para asegurar
+                });
+            }
+        }
+        
+        // Inicializar
+        setupCheckboxListeners();
+        updateDeleteButton();
+        
+        // También actualizar cuando se cargue contenido dinámicamente
+        setTimeout(setupCheckboxListeners, 500);
+        setTimeout(updateDeleteButton, 600);
+        
+        // Observar cambios en la tabla (para paginación, etc.)
+        const observer = new MutationObserver(function() {
+            setTimeout(function() {
+                setupCheckboxListeners();
+                updateDeleteButton();
+            }, 300);
+        });
+        
+        const tableContainer = document.querySelector('#changelist');
+        if (tableContainer) {
+            observer.observe(tableContainer, { childList: true, subtree: true });
+        }
+    });
+</script>
+{% endblock %}

@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 import psycopg2
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 class Task(models.Model):
     title = models.CharField(max_length=100)
@@ -38,7 +39,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
     empresa = models.CharField(max_length=100, default='Mi Empresa')
     nombre = models.CharField(max_length=100)
     estado = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(auto_now_add=True)
+    date_joined = models.DateTimeField(default=timezone.now)    
     last_login = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

@@ -619,10 +619,11 @@
           ascensor,
           estado,
         };
-
+        console.log("Datos a enviar a la API:", data);
         try {
           const prediccionResponse = await fetch(
-            "http://3.149.1.189/api/prediccion/",
+            //"http://3.149.1.189/api/prediccion/",
+            "https://apiprediccion.onrender.com/api/prediccion/",
             {
               method: "POST",
               headers: {

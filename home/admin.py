@@ -10,6 +10,7 @@ from .admin_filters import CiudadFilter, DistritoFilter, BarrioFilter, CalleFilt
 import json 
 from django.http import JsonResponse
 from django.urls import path
+from django.contrib import messages
 # ------------------------------
 # Modelo Valoracion
 # ------------------------------
@@ -33,9 +34,9 @@ class ValoracionAdmin(admin.ModelAdmin):
         
         ciudades_options = []
         for i, ciudad in enumerate(ciudades):
-            if ciudad:  # Solo agregar si no está vacío
+            if ciudad:
                 ciudades_options.append({
-                    'id': ciudad,  # Usamos el nombre como ID
+                    'id': ciudad,
                     'name': ciudad
                 })
         
@@ -69,7 +70,7 @@ class ValoracionAdmin(admin.ModelAdmin):
         
         distritos_list = []
         for distrito in distritos:
-            if distrito:  # Solo agregar si no está vacío
+            if distrito:
                 distritos_list.append({
                     'id': distrito,
                     'name': distrito
@@ -84,7 +85,7 @@ class ValoracionAdmin(admin.ModelAdmin):
         
         barrios_list = []
         for barrio in barrios:
-            if barrio:  # Solo agregar si no está vacío
+            if barrio:
                 barrios_list.append({
                     'id': barrio,
                     'name': barrio
@@ -160,9 +161,6 @@ class UsersCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ('usuario', 'email', 'empresa', 'nombre')
-    def __init__(self, model, admin_site):
-        super().__init__(model, admin_site)
-        self.model._meta.verbose_name_plural = "Usuarios"
 
 
 # --- FORMULARIO DE EDICIÓN ---
@@ -176,16 +174,43 @@ class UsersAdmin(BaseUserAdmin):
     add_form = UsersCreationForm
     form = UsersChangeForm
     model = User
+    list_filter = ()
+    search_fields = ()
     list_display = ('uniqueid', 'usuario', 'email', 'empresa', 'nombre', 'estado', 'is_active', 'is_staff')
-    list_filter = ('estado', 'is_active', 'is_staff')
     ordering = ('uniqueid',)
-    search_fields = ('usuario', 'email', 'nombre')
-
+    actions_on_top = False
+    actions_on_bottom = False
+    actions_selection_counter = False
+    actions = []
+    def delete_selected_users(self, request, queryset):
+        count = queryset.count()
+        deleted_count = 0
+        
+        for user in queryset:
+            if user.is_superuser:
+                messages.error(request, f'No se puede eliminar al superusuario {user.usuario}')
+                continue
+            if user == request.user:
+                messages.error(request, 'No puedes eliminarte a ti mismo')
+                continue
+            user.delete()
+            deleted_count += 1
+        
+        if deleted_count == 1:
+            message = "1 usuario fue eliminado exitosamente"
+        elif deleted_count > 1:
+            message = f"{deleted_count} usuarios fueron eliminados exitosamente"
+        else:
+            message = "No se eliminó ningún usuario"
+        
+        self.message_user(request, message)
+    
+    delete_selected_users.short_description = "Eliminar usuarios seleccionados"
     fieldsets = (
         (None, {'fields': ('usuario', 'password')}),
         ('Información personal', {'fields': ('email', 'empresa', 'nombre', 'estado')}),
         ('Permisos', {'fields': ('is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Fechas', {'fields': ('last_login', 'date_joined')}),
+        ('Fechas', {'fields': ('date_joined',)}),
     )
 
     add_fieldsets = (
@@ -194,9 +219,31 @@ class UsersAdmin(BaseUserAdmin):
             'fields': ('usuario', 'email', 'password1', 'password2', 'empresa', 'nombre', 'estado'),
         }),
     )
+    change_list_template = 'admin/home/user/change_list.html'
+    
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        
+        # Obtener empresas únicas para filtro
+        empresas = User.objects.values_list('empresa', flat=True).distinct()
+        empresas_options = [{'id': emp, 'name': emp} for emp in empresas if emp]
+        
+        # Obtener estados únicos
+        estados = User.objects.values_list('estado', flat=True).distinct()
+        estados_options = [{'id': est, 'name': est} for est in estados if est]
+        
+        extra_context['empresas_json'] = json.dumps(empresas_options)
+        extra_context['estados_json'] = json.dumps(estados_options)
+        extra_context['context_json'] = json.dumps({
+            'empresa': request.GET.get('empresa', ''),
+            'estado': request.GET.get('estado', ''),
+            'busqueda': request.GET.get('q', '')
+        })
+        
+        return super().changelist_view(request, extra_context=extra_context)
     def __init__(self, model, admin_site):
         super().__init__(model, admin_site)
-        self.model._meta.verbose_name_plural = "Usuarios"
+        model._meta.verbose_name_plural = "Usuarios"
 
 admin.site.register(User, UsersAdmin)
 # ------------------------------

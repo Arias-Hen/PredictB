@@ -108,12 +108,13 @@
                     class="sidebar-link btn-hover text-white text-decoration-none py-2 px-3 rounded">
                     <span class="ms-2">INFORMES</span>
                 </a>
-                <a href="{% url 'home:logout_home' %}"
-                    class="sidebar-link btn-hover text-white text-decoration-none py-2 px-3 rounded">
-                    <span class="ms-2">CERRAR SESIÓN</span>
-                </a>
-
-
+                <form method="post" action="{% url 'home:logout_home' %}" class="p-0 m-0">
+                    {% csrf_token %}
+                    <button type="submit"
+                        class="sidebar-link btn-hover text-white text-decoration-none py-2 px-3 rounded w-100 d-flex align-items-center border-0 bg-transparent">
+                        <span class="ms-2">CERRAR SESIÓN</span>
+                    </button>
+                </form>
             </div>
         </nav>
     </div>
