@@ -710,3 +710,4 @@ from django.contrib.auth.views import LogoutView
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('home:home')
+    http_method_names = ['get', 'post'] 
