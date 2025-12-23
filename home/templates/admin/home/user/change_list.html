@@ -3,9 +3,18 @@
 
 {% block extrahead %}
 {{ block.super }}
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
+    #changelist-form input[type="submit"][value="Go"],
+    #changelist-form .button,
+    #changelist-form .actions,
+    #changelist-form .paginator,
+    #changelist-form .paginator input,
+    #changelist-form .paginator select {
+        display: none !important;
+    }
     .user-filter-section {
         margin: 0 0 15px 0;
         background: #ffffff;
@@ -195,6 +204,10 @@
 {% endblock %}
 
 {% block content %}
+{% block search %}{% endblock %}
+{% block pagination %}{% endblock %}
+{% block actions %}{% endblock %}
+
 <!-- FILTROS PARA USUARIOS-->
 <div class="user-filter-section">
     <div class="user-filter-row">

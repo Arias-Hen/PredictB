@@ -6,6 +6,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
+    #changelist-form input[type="submit"][value="Go"],
+    #changelist-form .button,
+    #changelist-form .actions,
+    #changelist-form .paginator,
+    #changelist-form .paginator input,
+    #changelist-form .paginator select {
+        display: none !important;
+    }
     .filter-section {
         margin: 0 0 12px 0;
         background: #f8f9fa;
@@ -140,6 +148,8 @@
 {% endblock %}
 
 {% block content %}
+{% block search %}{% endblock %}
+{% block pagination %}{% endblock %}
 {# Aquí renderizamos un formulario horizontal con filtros #}
 <div class="filter-section">
     <div class="filter-row">
@@ -233,26 +243,18 @@
 {% block extrajs %}
 {{ block.super }}
 <script>
-    console.log('=== INICIALIZANDO FILTROS VALORACIONES ===');
-
     const optionsJson = '{{ options_json|escapejs }}';
-    console.log('Datos de ciudades recibidos:', optionsJson);
-
     let ciudadesData = [];
     try {
         ciudadesData = JSON.parse(optionsJson || '[]');
-        console.log('Ciudades parseadas:', ciudadesData);
     } catch (e) {
         console.error('Error parseando ciudades:', e);
     }
 
     const currentPath = window.location.pathname;
     const baseUrl = currentPath.split('/change_list/')[0];
-    console.log('URL base para AJAX:', baseUrl);
-
 
     function obtenerTablaDjangoAdmin() {
-        console.log('=== BUSCANDO TABLA DE DJANGO ADMIN ===');
 
         let tabla = document.querySelector('.results table');
 
@@ -289,28 +291,19 @@
             console.log('No hay tabla para depurar');
             return;
         }
-
-        console.log('=== 🎯 ESTRUCTURA DE LA TABLA DJANGO ===');
-
         // 1. Headers (columnas)
         const headers = tabla.querySelectorAll('thead th');
-        console.log(`\n📋 HEADERS (${headers.length} columnas):`);
         headers.forEach((header, index) => {
             const texto = header.textContent?.trim() || '';
-            console.log(`  ${index}. "${texto}"`);
         });
 
         const filas = tabla.querySelectorAll('tbody tr');
-        console.log(`\n📊 FILAS DE DATOS (${filas.length} filas):`);
 
         if (filas.length > 0) {
             const primeraFila = filas[0];
             const celdas = primeraFila.querySelectorAll('td');
-
-            console.log(`\n📍 PRIMERA FILA (${celdas.length} celdas):`);
             celdas.forEach((celda, index) => {
                 const texto = celda.textContent?.trim();
-                console.log(`  ${index}. "${texto}"`);
             });
         }
 
@@ -321,7 +314,6 @@
         const selectCiudad = document.getElementById('ciudad_1');
 
         if (!selectCiudad) {
-            console.error('Select ciudad_1 no encontrado');
             return;
         }
 
@@ -340,7 +332,6 @@
         });
 
         selectCiudad.disabled = false;
-        console.log('Ciudades cargadas:', ciudadesData.length);
     }
 
     function cargarDistritos(ciudad) {
@@ -373,7 +364,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Distritos recibidos:', data);
                 selectDistrito.innerHTML = '<option value="">Todos</option>';
 
                 if (data.distritos && data.distritos.length > 0) {
@@ -388,7 +378,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error al cargar distritos:', error);
                 selectDistrito.innerHTML = '<option value="">Error al cargar</option>';
             });
     }
@@ -418,7 +407,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Barrios recibidos:', data);
                 selectBarrio.innerHTML = '<option value="">Todos</option>';
 
                 if (data.barrio && data.barrio.length > 0) {
@@ -433,7 +421,6 @@
                 }
             })
             .catch(error => {
-                console.error('Error al cargar barrios:', error);
                 selectBarrio.innerHTML = '<option value="">Error al cargar</option>';
             });
     }
@@ -458,7 +445,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Calles recibidas:', data);
                 selectCalle.innerHTML = '<option value="">Todos</option>';
 
                 if (data.calle && data.calle.length > 0) {
@@ -473,13 +459,11 @@
                 }
             })
             .catch(error => {
-                console.error('Error al cargar calles:', error);
                 selectCalle.innerHTML = '<option value="">Error al cargar</option>';
             });
     }
 
     function filtrarTablaDjango() {
-        console.log('=== FILTRANDO TABLA DJANGO ADMIN ===');
 
         const desde = document.getElementById('desde')?.value || '';
         const hasta = document.getElementById('hasta')?.value || '';
@@ -498,29 +482,23 @@
 
         const tabla = obtenerTablaDjangoAdmin();
         if (!tabla) {
-            console.error('No se pudo encontrar la tabla de Django Admin');
             return;
         }
 
         const tbody = tabla.querySelector('tbody');
         if (!tbody) {
-            console.error('No se encontró tbody en la tabla');
             return;
         }
 
         const filas = tbody.querySelectorAll('tr');
-        console.log(`Filas a filtrar: ${filas.length}`);
 
         if (filas.length === 0) {
-            console.log('No hay filas para filtrar');
             return;
         }
 
 
         const primeraFila = filas[0];
         const celdasPrimera = primeraFila.querySelectorAll('td');
-        console.log(`Estructura detectada: ${celdasPrimera.length} columnas por fila`);
-
 
         const INDICES = {
             MODO: 2,        // 'modo' 
@@ -535,8 +513,6 @@
             PRECIO_UNICO: 21 // 'precio_esperado_unico'
         };
 
-        console.log('Índices corregidos para tabla con checkbox:', INDICES);
-
         let visibleCount = 0;
 
         filas.forEach((fila, indexFila) => {
@@ -544,7 +520,6 @@
             const celdas = fila.querySelectorAll('td');
 
             if (celdas.length < INDICES.FECHA) {
-                console.warn(`Fila ${indexFila} tiene menos celdas (${celdas.length}) de las esperadas (${INDICES.FECHA})`);
                 fila.style.display = 'none';
                 return;
             }
@@ -553,8 +528,6 @@
                 const celdaFecha = celdas[INDICES.FECHA];
                 if (celdaFecha) {
                     const textoFecha = celdaFecha.textContent?.trim() || '';
-                    console.log(`Fila ${indexFila} - Fecha: "${textoFecha}"`);
-
                     if (textoFecha) {
                         let fechaFila = null;
 
@@ -568,8 +541,6 @@
 
                             const mesNum = meses[mesTexto.substring(0, 3)] || 0;
                             fechaFila = new Date(anio, mesNum, parseInt(dia));
-
-                            console.log(`Fecha parseada: ${fechaFila.toISOString().split('T')[0]}`);
                         }
 
                         if (fechaFila) {
@@ -577,7 +548,6 @@
                                 const fechaDesde = new Date(desde);
                                 fechaDesde.setHours(0, 0, 0, 0);
                                 if (fechaFila < fechaDesde) {
-                                    console.log(`❌ Fecha ${fechaFila.toISOString().split('T')[0]} es menor que ${desde}`);
                                     mostrar = false;
                                 }
                             }
@@ -586,12 +556,10 @@
                                 const fechaHasta = new Date(hasta);
                                 fechaHasta.setHours(23, 59, 59, 999);
                                 if (fechaFila > fechaHasta) {
-                                    console.log(`❌ Fecha ${fechaFila.toISOString().split('T')[0]} es mayor que ${hasta}`);
                                     mostrar = false;
                                 }
                             }
                         } else {
-                            console.log(`⚠️ No se pudo parsear fecha: "${textoFecha}"`);
                         }
                     }
                 }
@@ -602,7 +570,6 @@
                 if (celdaTipo) {
                     const textoTipo = celdaTipo.textContent?.trim().toLowerCase() || '';
                     if (textoTipo !== tipo.toLowerCase()) {
-                        console.log(`❌ Tipo "${textoTipo}" no coincide con "${tipo}"`);
                         mostrar = false;
                     }
                 }
@@ -612,7 +579,6 @@
                 if (celdaCiudad) {
                     const textoCiudad = celdaCiudad.textContent?.trim() || '';
                     if (textoCiudad !== ciudad) {
-                        console.log(`❌ Ciudad "${textoCiudad}" no coincide con "${ciudad}"`);
                         mostrar = false;
                     }
                 }
@@ -623,7 +589,6 @@
                 if (celdaDistrito) {
                     const textoDistrito = celdaDistrito.textContent?.trim() || '';
                     if (textoDistrito !== distrito) {
-                        console.log(`❌ Distrito "${textoDistrito}" no coincide con "${distrito}"`);
                         mostrar = false;
                     }
                 }
@@ -633,7 +598,6 @@
                 if (celdaBarrio) {
                     const textoBarrio = celdaBarrio.textContent?.trim() || '';
                     if (textoBarrio !== barrio) {
-                        console.log(`❌ Barrio "${textoBarrio}" no coincide con "${barrio}"`);
                         mostrar = false;
                     }
                 }
@@ -644,7 +608,6 @@
                 if (celdaCalle) {
                     const textoCalle = celdaCalle.textContent?.trim() || '';
                     if (textoCalle !== calle) {
-                        console.log(`❌ Calle "${textoCalle}" no coincide con "${calle}"`);
                         mostrar = false;
                     }
                 }
@@ -668,7 +631,6 @@
                                 if (!isNaN(precio) && precio > 0) {
                                     precioValor = precio;
                                     precioEncontrado = true;
-                                    console.log(`💰 Precio encontrado en índice ${idx}: ${precioValor}`);
                                     break;
                                 }
                             }
@@ -678,7 +640,6 @@
 
                 if (precioEncontrado) {
                     if (precioValor < precioDesde || precioValor > precioHasta) {
-                        console.log(`❌ Precio ${precioValor} fuera de rango [${precioDesde}, ${precioHasta}]`);
                         mostrar = false;
                     }
                 }
@@ -687,17 +648,12 @@
             if (mostrar) {
                 fila.style.display = '';
                 visibleCount++;
-                console.log(`✅ Fila ${indexFila} MOSTRADA`);
             } else {
                 fila.style.display = 'none';
-                console.log(`❌ Fila ${indexFila} OCULTADA`);
             }
         });
 
-        console.log(`✅ Filtrado completado: ${visibleCount} de ${filas.length} filas visibles`);
-
         if (visibleCount === 0) {
-            console.log('⚠️ No hay resultados que coincidan con los filtros');
 
             const mensajeNoResultados = document.getElementById('mensaje-no-resultados');
             if (!mensajeNoResultados) {
@@ -719,7 +675,6 @@
         }
     }
     document.addEventListener('DOMContentLoaded', function () {
-        console.log('DOM cargado - Inicializando filtros Django Admin');
 
         const hoy = new Date();
         const yyyy = hoy.getFullYear();
@@ -747,7 +702,6 @@
         const ciudadSelect = document.getElementById('ciudad_1');
         if (ciudadSelect) {
             ciudadSelect.addEventListener('change', function () {
-                console.log('Ciudad seleccionada:', this.value);
                 cargarDistritos(this.value);
                 setTimeout(filtrarTablaDjango, 300);
             });
@@ -756,7 +710,6 @@
         const distritoSelect = document.getElementById('distrito_1');
         if (distritoSelect) {
             distritoSelect.addEventListener('change', function () {
-                console.log('Distrito seleccionado:', this.value);
                 cargarBarrios(this.value);
                 setTimeout(filtrarTablaDjango, 300);
             });
@@ -765,7 +718,6 @@
         const barrioSelect = document.getElementById('barrio_1');
         if (barrioSelect) {
             barrioSelect.addEventListener('change', function () {
-                console.log('Barrio seleccionado:', this.value);
                 cargarCalles(this.value);
                 setTimeout(filtrarTablaDjango, 300);
             });
@@ -782,7 +734,6 @@
         if (calleSelect) calleSelect.addEventListener('change', filtrarTablaDjango);
 
         document.getElementById('limpiar-filtros')?.addEventListener('click', function () {
-            console.log('Limpiando filtros...');
 
             if (desdeInput) desdeInput.value = fechaEnero;
             if (hastaInput) hastaInput.value = fechaHoy;
@@ -802,7 +753,6 @@
 
             setTimeout(filtrarTablaDjango, 500);
 
-            console.log('Filtros limpiados');
         });
 
         setTimeout(debugTablaDjango, 1000);
@@ -812,7 +762,6 @@
             filtrarTablaDjango();
         }, 1500);
 
-        console.log('✅ Filtros Django Admin inicializados');
     });
 </script>
 {% endblock %}
