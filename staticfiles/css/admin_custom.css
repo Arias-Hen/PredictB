@@ -1,0 +1,47 @@
+/* Fondo principal del sidebar */
+.main-sidebar {
+    background-color: #0001a0 !important;
+}
+
+/* Header del sidebar (logo area) */
+.main-sidebar .brand-link {
+    background-color: #0001a0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Texto del logo */
+.main-sidebar .brand-text {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+/* Items del menú */
+.nav-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    border-radius: 6px;
+    margin: 4px 8px;
+    transition: all 0.2s ease;
+}
+
+/* Hover */
+.nav-sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+/* Item activo */
+.nav-sidebar .nav-link.active {
+    background-color: #ffffff !important;
+    color: #0001a0 !important;
+    font-weight: 600;
+}
+
+/* Iconos */
+.nav-sidebar .nav-icon {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Icono activo */
+.nav-sidebar .nav-link.active .nav-icon {
+    color: #0001a0 !important;
+}
