@@ -1,0 +1,32 @@
+/* 
+ * Este CSS DESACTIVA características pesadas de AdminLTE/Jazzmin
+ * pero mantiene tu CSS personalizado funcionando
+ */
+
+/* 1. Desactivar animaciones y transiciones (pesadas) */
+* {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* 2. Desactivar efectos hover pesados */
+.nav-link:hover, .btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* 3. Desactivar sombras pesadas */
+.card, .sidebar, .main-header {
+    box-shadow: none !important;
+}
+
+/* 4. Desactivar background gradients pesados */
+.bg-gradient, [class*="bg-gradient-"] {
+    background: #f8f9fa !important;
+}
+
+/* 5. Simplificar modales (si related_modal_active está en False) */
+.modal-content {
+    border-radius: 0 !important;
+    border: 1px solid #dee2e6 !important;
+}

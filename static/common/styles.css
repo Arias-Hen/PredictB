@@ -1,0 +1,123 @@
+
+.select2-container {
+    display: none !important; 
+}
+
+.calendarbox, .clockbox {
+    display: none !important;
+}
+
+.fa, .fas, .far, .fab {
+    font-size: 14px !important;
+}
+
+/* D. Tablas más simples */
+.table {
+    font-size: 13px !important;
+}
+
+.table th, .table td {
+    padding: 4px 8px !important;
+}
+
+.content-wrapper, .card-body {
+    padding: 10px !important;
+}
+.btn-primary {
+    background-color: #0001A0 !important;
+    border-color: #0001A0 !important;
+}
+
+.btn-primary:hover {
+    background-color: #000088 !important;
+    border-color: #000088 !important;
+}
+.main-sidebar{
+    background-color: #0001A0;
+}
+.login-logo img {
+    width: 200px !important;
+    height: auto !important;
+}
+.btn-success {
+    background-color: #0001A0;   /* Color base */
+    color: #fff;                 /* Texto en blanco */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;   /* Animación suave */
+}
+.btn-success:hover {
+    background-color: #1A1CFF;   /* Variante más clara */
+    box-shadow: 0px 4px 12px rgba(0, 1, 160, 0.4); /* Glow azul */
+}
+.btn-info {
+    background-color: #0001A0   !important;
+    border-color: #000070       !important;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+.btn-info:hover {
+    background-color: #1A1CFF   !important;
+    border-color: #0001A0       !important;
+    color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 1, 160, 0.4)   !important;
+}
+/* Cambiar color de los enlaces en el breadcrumb */
+.breadcrumb .breadcrumb-item a {
+    color: #0001A0 !important;   /* Azul profundo */
+    text-decoration: none;       /* Quitar subrayado (opcional) */
+    transition: color 0.3s ease;
+}
+
+/* Hover de los enlaces en el breadcrumb */
+.breadcrumb .breadcrumb-item a:hover {
+    color: #1A1CFF !important;   /* Azul vibrante al pasar mouse */
+    text-decoration: underline;  /* Subrayado en hover (opcional) */
+}
+.table thead th {
+    color: #fff !important;                /* Texto en blanco */
+}
+.table tbody tr:hover {
+    background-color: #E5E7FF !important;  /* Azul claro de fondo */
+    color: #0001A0 !important;             /* Texto en azul */
+}
+.table a {
+    color: #0001A0 !important;  /* Azul base */
+    transition: color 0.3s ease;
+}
+
+.table a:hover {
+    color: #1A1CFF !important;  /* Azul vibrante */
+    text-decoration: underline;
+}
+
+/* Checkbox de "Select all" en el header */
+#action-toggle {
+    accent-color: #0001A0;   /* cambia el check nativo al azul profundo */
+}
+
+/* Opcional: hover/foco */
+#action-toggle:hover {
+    outline: 2px solid #1A1CFF; /* Glow azul vibrante al pasar mouse */
+    cursor: pointer;
+}
+
+#action-toggle:focus {
+    outline: 2px solid #1A1CFF;
+}
+/* Checkbox en cada fila */
+.action-select {
+    accent-color: #0001A0;   /* Azul profundo */
+    cursor: pointer;
+}
+
+/* Hover sobre el checkbox */
+.action-select:hover {
+    outline: 2px solid #1A1CFF; /* Glow azul vibrante */
+}
+
+/* Cuando el checkbox está en foco (con tab/teclado) */
+.action-select:focus {
+    outline: 2px solid #1A1CFF;
+}
