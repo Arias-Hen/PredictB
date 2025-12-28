@@ -692,7 +692,6 @@ def enviar_vivienda_email(request):
             "pdf_url": ruta_pdf
         })
     return JsonResponse({"error": "Método no permitido"}, status=405)
-
 def generar_descripcion_vivienda(m2, hab, banos, ascensor):
     client = OpenAI(
         api_key=OPENAI_API_KEY

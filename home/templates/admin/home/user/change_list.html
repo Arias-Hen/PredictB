@@ -290,7 +290,7 @@
     </div>
 </div>
 
-<!-- CONTENEDOR PARA EL BOTÓN DE ELIMINAR -->
+<!-- BOTÓN DE ELIMINAR -->
 <div class="delete-action-container">
     <div style="display: flex; align-items: center;">
         <button id="fixed-delete-btn" type="button" disabled>
@@ -315,7 +315,7 @@
 {% block extrajs %}
 {{ block.super }}
 <script>
-    // FUNCIÓN PARA FILTRAR USUARIOS - VERSIÓN MEJORADA
+    // FILTRAR USUARIOS
     function filtrarUsuarios() {
         const usuario = document.getElementById('search-usuario').value.toLowerCase();
         const email = document.getElementById('search-email').value.toLowerCase();
@@ -333,8 +333,7 @@
             let mostrar = true;
             const celdas = fila.querySelectorAll('td');
             
-            // Ajusta estos índices según tu list_display:
-            // list_display = ('uniqueid', 'usuario', 'email', 'empresa', 'nombre', 'estado', 'is_active', 'is_staff')
+            // indices_mostrados
             const INDICES = {
                 USUARIO: 1,    // 'usuario'
                 EMAIL: 2,      // 'email'  
@@ -344,7 +343,7 @@
                 ACTIVO: 6      // 'is_active'
             };
             
-            // 1. Filtro por USUARIO (índice 1)
+            // 1. Filtro por USUARIO
             if (usuario && mostrar) {
                 const celdaUsuario = celdas[INDICES.USUARIO];
                 if (celdaUsuario) {
@@ -357,7 +356,7 @@
                 }
             }
             
-            // 2. Filtro por EMAIL (índice 2)
+            // 2. Filtro por EMAIL
             if (email && mostrar) {
                 const celdaEmail = celdas[INDICES.EMAIL];
                 if (celdaEmail) {
@@ -370,7 +369,7 @@
                 }
             }
             
-            // 3. Filtro por NOMBRE (índice 4)
+            // 3. Filtro por NOMBRE
             if (nombre && mostrar) {
                 const celdaNombre = celdas[INDICES.NOMBRE];
                 if (celdaNombre) {
@@ -383,7 +382,7 @@
                 }
             }
             
-            // 4. Filtro por EMPRESA (índice 3)
+            // 4. Filtro por EMPRESA
             if (empresa && mostrar) {
                 const celdaEmpresa = celdas[INDICES.EMPRESA];
                 if (celdaEmpresa) {
@@ -396,7 +395,7 @@
                 }
             }
             
-            // 5. Filtro por ESTADO (índice 5)
+            // 5. Filtro por ESTADO
             if (estado && mostrar) {
                 const celdaEstado = celdas[INDICES.ESTADO];
                 if (celdaEstado) {
@@ -409,7 +408,7 @@
                 }
             }
             
-            // 6. Filtro por ACTIVO (índice 6)
+            // 6. Filtro por ACTIVO
             if (activo && mostrar) {
                 const celdaActivo = celdas[INDICES.ACTIVO];
                 if (celdaActivo) {
@@ -425,20 +424,16 @@
             
             fila.style.display = mostrar ? '' : 'none';
         });
-        
-        // Actualizar contador total después de filtrar
         updateDeleteButton();
     }
     
-    // FUNCIÓN PARA ACTUALIZAR EL BOTÓN DE ELIMINAR
+    // FUNCIÓN PARA ACTUALIZAR DESPUES DE ELIMINAR
     function updateDeleteButton() {
         const deleteBtn = document.getElementById('fixed-delete-btn');
         const selectedCounter = document.getElementById('selected-counter');
         const deleteBtnText = document.getElementById('delete-btn-text');
         const currentSelection = document.getElementById('current-selection');
         const actionSelect = document.querySelector('select[name="action"]');
-        
-        // Obtener todos los checkboxes visibles
         const visibleRows = Array.from(document.querySelectorAll('#result_list tbody tr'))
             .filter(row => row.style.display !== 'none');
         
@@ -448,8 +443,6 @@
         
         const selectedCheckboxes = visibleCheckboxes.filter(cb => cb.checked);
         const selectedCount = selectedCheckboxes.length;
-        
-        // Actualizar botón
         if (selectedCount > 0) {
             deleteBtn.disabled = false;
             selectedCounter.style.display = 'inline-block';
@@ -460,20 +453,14 @@
             selectedCounter.style.display = 'none';
             deleteBtnText.textContent = 'Eliminar seleccionados';
         }
-        
-        // Actualizar estadísticas
         if (currentSelection) {
             currentSelection.textContent = selectedCount;
         }
-        
-        // Actualizar el selector de acciones si existe
         if (actionSelect && actionSelect.options.length > 0) {
-            // Buscar la opción de eliminar usuarios
             const deleteOption = Array.from(actionSelect.options)
                 .find(opt => opt.value === 'delete_selected_users');
             
             if (deleteOption) {
-                // Actualizar el texto si hay usuarios seleccionados
                 if (selectedCount > 0) {
                     deleteOption.textContent = `🗑️ Eliminar ${selectedCount} usuario(s) seleccionado(s)`;
                 } else {
@@ -529,9 +516,6 @@
         document.getElementById('estado-filter').addEventListener('change', filtrarUsuarios);
         document.getElementById('activo-filter').addEventListener('change', filtrarUsuarios);
         
-        // Botón búsqueda avanzada (opcional)
-        document.getElementById('buscar-avanzado').addEventListener('click', filtrarUsuarios);
-        
         // Botón limpiar
         document.getElementById('limpiar-filtros-user').addEventListener('click', function() {
             document.getElementById('search-usuario').value = '';
@@ -574,11 +558,10 @@
         setupCheckboxListeners();
         updateDeleteButton();
         
-        // También actualizar cuando se cargue contenido dinámicamente
         setTimeout(setupCheckboxListeners, 500);
         setTimeout(updateDeleteButton, 600);
         
-        // Observar cambios en la tabla (para paginación, etc.)
+        // Observar cambios en la tabla
         const observer = new MutationObserver(function() {
             setTimeout(function() {
                 setupCheckboxListeners();

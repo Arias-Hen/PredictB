@@ -9,10 +9,6 @@ from django.contrib import messages
 from django.core.cache import cache
 import json
 
-# ======================================================
-# HELPERS
-# ======================================================
-
 def clean_bool(value):
     if value is None:
         return None
@@ -28,7 +24,6 @@ def clean_bool(value):
 
 # ======================================================
 # MODELO VALORACION
-# ======================================================
 
 @admin.register(Valoracion)
 class ValoracionAdmin(admin.ModelAdmin):
@@ -78,7 +73,6 @@ class ValoracionAdmin(admin.ModelAdmin):
         })
         return super().changelist_view(request, extra_context=extra_context)
 
-    # ---------- ENDPOINTS AJAX ----------
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -125,6 +119,8 @@ class ValoracionAdmin(admin.ModelAdmin):
         return JsonResponse({'calle': [{'id': c, 'name': c} for c in data]})
 
     # ---------- DISPLAY ----------
+    @admin.display(description="Tipo de Vivienda",
+    ordering="tipo_vivienda")
     def get_tipo_vivienda_text(self, obj):
         return {
             '0': 'Estudio',
@@ -135,7 +131,9 @@ class ValoracionAdmin(admin.ModelAdmin):
             '5': 'Chalet pareado',
             '6': 'Casa o chalet',
         }.get(str(obj.tipo_vivienda), 'No especificado')
-
+    
+    @admin.display(description="Estado del Inmueble",
+    ordering="estado_inmueble")
     def get_estado_inmueble(self, obj):
         return {
             '0': 'Obra nueva',
@@ -150,7 +148,6 @@ class ValoracionAdmin(admin.ModelAdmin):
 
 # ======================================================
 # MODELO USERS (CUSTOM USER)
-# ======================================================
 
 User = get_user_model()
 
@@ -194,10 +191,8 @@ class UsersAdmin(BaseUserAdmin):
 
     change_list_template = 'admin/home/user/change_list.html'
 
-    # 🔒 CAMPOS NO EDITABLES
     readonly_fields = ('last_login', 'date_joined')
 
-    # ---------- EDICIÓN ----------
     fieldsets = (
         (None, {'fields': ('usuario', 'password')}),
         ('Información personal', {
@@ -227,7 +222,6 @@ class UsersAdmin(BaseUserAdmin):
         }),
     )
 
-    # ---------- CACHE EMPRESAS ----------
     def get_empresas(self):
         key = 'users_empresas'
         data = cache.get(key)
@@ -242,7 +236,6 @@ class UsersAdmin(BaseUserAdmin):
             cache.set(key, data, 3600)
         return data
 
-    # ---------- CACHE ESTADOS (BOOLEAN) ----------
     def get_estados(self):
         key = 'users_estados'
         data = cache.get(key)
@@ -255,7 +248,6 @@ class UsersAdmin(BaseUserAdmin):
             cache.set(key, data, 3600)
         return data
 
-    # ---------- PROTECCIÓN BOOLEANOS ----------
     def get_queryset(self, request):
         qs = super().get_queryset(request)
 
@@ -291,7 +283,7 @@ class UsersAdmin(BaseUserAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-    # ---------- ACCIÓN BORRAR ----------
+    #BORRAR
     def delete_selected_users(self, request, queryset):
         deleted = 0
         for user in queryset:
@@ -303,11 +295,6 @@ class UsersAdmin(BaseUserAdmin):
     def __init__(self, model, admin_site):
         super().__init__(model, admin_site)
         self.model._meta.verbose_name_plural = "Usuarios"
-
-
-# ======================================================
-# OTROS MODELOS
-# ======================================================
 
 @admin.register(Vivienda)
 class ViviendaAdmin(admin.ModelAdmin):

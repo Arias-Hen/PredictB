@@ -7,9 +7,15 @@ def generar_pdf(vivienda, imagenes):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-
-    if os.path.exists("logo.jpg"):
-        pdf.image("logo.jpg", x=80, y=10, w=50)
+    logo_path = os.path.join(
+    settings.BASE_DIR,
+    'staticfiles',
+    'images',
+    'logo.jpeg'
+    )
+    if os.path.isfile(logo_path):
+        pdf.image(logo_path, x=10, y=10, w=40)
+    
     pdf.ln(30)
 
     pdf.set_font("Arial", style="B", size=16)

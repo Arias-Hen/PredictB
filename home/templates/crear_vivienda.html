@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario JS</title>
+</head>
+
+<body>
+  <h2>Formulario de Vivienda</h2>
+  <form id="formulario-vivienda">
+    <label>Metros Cuadrados:</label>
+    <input type="number" name="metros_cuadrados" required><br>
+
+    <label>Habitaciones:</label>
+    <input type="number" name="habitaciones" required><br>
+
+    <label>Baños:</label>
+    <input type="number" name="banos" required><br>
+
+    <label>Ascensor:</label>
+    <select name="ascensor">
+      <option value="true">Sí</option>
+      <option value="false">No</option>
+    </select><br>
+
+    <label>Imágenes:</label>
+    <input type="file" name="imagenes" multiple><br><br>
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <div id="respuesta"></div>
+
+  <script>
+    document.getElementById('formulario-vivienda').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData();
+
+      formData.append('metros_cuadrados', form.metros_cuadrados.value);
+      formData.append('habitaciones', form.habitaciones.value);
+      formData.append('banos', form.banos.value);
+      formData.append('ascensor', form.ascensor.value);
+
+      const files = form.imagenes.files;
+      for (let i = 0; i < files.length; i++) {
+        formData.append('imagenes[]', files[i]);
+      }
+
+      try {
+        const res = await fetch("/home/api/vivienda/", {
+          method: 'POST',
+          body: formData,
+        });
+
+        const text = await res.text();
+
+        try {
+          const data = JSON.parse(text);
+
+          document.getElementById('respuesta').innerHTML = `
+      <p><strong>${data.mensaje}</strong></p>
+      <p><em>${data.descripcion}</em></p>
+      ${data.pdf_url ? `<a href="${data.pdf_url}" target="_blank">📄 Descargar PDF</a>` : ''}
+    `;
+        } catch (err) {
+          console.error('Respuesta no es JSON:', text);
+          document.getElementById('respuesta').innerHTML = '⚠️ Error: el servidor devolvió una respuesta no válida.';
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error al enviar el formulario');
+      }
+    });
+  </script>
+</body>
+
+</html>

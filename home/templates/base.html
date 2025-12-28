@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PredictBuild</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar-brand {
@@ -62,7 +61,6 @@
     </style>
 </head>
 <body>
-    <!-- AÑADE ESTA LÍNEA AL INICIO DEL BODY -->
     {% load static %}
     
     <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar shadow">
@@ -154,7 +152,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
@@ -163,8 +160,6 @@
             const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const loginError = document.getElementById('loginError');
             const errorMessage = document.getElementById('errorMessage');
-            
-            // Mostrar modal si hay mensajes de error del servidor
             {% if messages %}
                 {% for message in messages %}
                     errorMessage.textContent = '{{ message }}';
@@ -172,18 +167,10 @@
                     loginModal.show();
                 {% endfor %}
             {% endif %}
-            
-            // Manejar envío del formulario con AJAX
             loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
-                // Ocultar mensaje de error previo
                 loginError.classList.add('d-none');
-                
-                // Obtener datos del formulario
                 const formData = new FormData(loginForm);
-                
-                // Enviar solicitud AJAX
                 fetch(loginForm.action, {
                     method: 'POST',
                     body: formData,
@@ -194,10 +181,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Si el login es exitoso, redirigir
                         window.location.href = data.redirect_url;
                     } else {
-                        // Mostrar mensaje de error y mantener el modal abierto
                         errorMessage.textContent = data.message;
                         loginError.classList.remove('d-none');
                         loginModal.show();
