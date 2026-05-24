@@ -8,6 +8,8 @@ from django.urls import path
 from django.contrib import messages
 from django.core.cache import cache
 import json
+from django.utils.translation import gettext_lazy as _
+
 
 def clean_bool(value):
     if value is None:
@@ -194,7 +196,7 @@ class UsersAdmin(BaseUserAdmin):
     readonly_fields = ('last_login', 'date_joined')
 
     fieldsets = (
-        (None, {'fields': ('usuario', 'password')}),
+        (None, {'fields': ('usuario',)}),
         ('Información personal', {
             'fields': ('email', 'empresa', 'nombre', 'estado')
         }),
@@ -295,6 +297,10 @@ class UsersAdmin(BaseUserAdmin):
     def __init__(self, model, admin_site):
         super().__init__(model, admin_site)
         self.model._meta.verbose_name_plural = "Usuarios"
+    
+    def response_add(self, request, obj, post_url_continue=None):
+        self.message_user(request, _(f'El usuario "{obj}" se ha agregado correctamente.'))
+        return super().response_add(request, obj, post_url_continue)
 
 @admin.register(Vivienda)
 class ViviendaAdmin(admin.ModelAdmin):
