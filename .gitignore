@@ -1,0 +1,140 @@
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+MANIFEST
+
+# ============================================================
+# Entornos virtuales
+# ============================================================
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# ============================================================
+# Django
+# ============================================================
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+mediafiles/
+
+# Archivos generados por collectstatic (STATIC_ROOT en este proyecto)
+/static/
+
+# Logs de la app
+logs/
+*.log.*
+
+# ============================================================
+# Jazzmin (estáticos del paquete — no versionar)
+# Se instala vía pip y collectstatic los regenera.
+# ============================================================
+**/jazzmin/
+staticfiles/jazzmin/
+static/jazzmin/
+
+# Estáticos del admin y DRF también los aporta el paquete
+static/admin/
+static/rest_framework/
+
+# ============================================================
+# Variables de entorno y secretos
+# ============================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ============================================================
+# Node / Tailwind
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.yarn/
+.pnp.*
+
+# ============================================================
+# Testing y cobertura
+# ============================================================
+.coverage
+.coverage.*
+.cache
+coverage.xml
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+nosetests.xml
+.hypothesis/
+
+# ============================================================
+# Notebooks / análisis
+# ============================================================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ============================================================
+# Editores e IDE
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ============================================================
+# Sistema operativo
+# ============================================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================================
+# Despliegues
+# ============================================================
+.vercel
+.gcloudignore
+.gae-deploy/
