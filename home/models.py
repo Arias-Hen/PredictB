@@ -14,7 +14,7 @@ class Task(models.Model):
     class Meta:
         ordering = ['-created']
 
-    def _str_(self):
+    def __str__(self):
         return self.title
 
 class UsersManager(BaseUserManager):
@@ -68,7 +68,17 @@ class Users(AbstractBaseUser, PermissionsMixin):
     
 class Valoracion(models.Model):
     idv = models.AutoField(primary_key=True)
-    iduser = models.IntegerField()
+    # FK lógico hacia Users(uniqueid). db_constraint=False evita tocar el schema en Neon,
+    # donde la tabla `ventas` se gestiona manualmente.
+    iduser = models.ForeignKey(
+        'home.Users',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='iduser',
+        db_constraint=False,
+        related_name='valoraciones',
+    )
     modo = models.CharField(max_length=50)
     ciudad = models.CharField(max_length=100)
     distrito = models.CharField(max_length=100)

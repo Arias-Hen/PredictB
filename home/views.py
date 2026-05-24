@@ -309,7 +309,7 @@ def guardar_valoracion(request):
             data = json.loads(request.body)
             nueva_valoracion = Valoracion.objects.create(
                 idv = data.get("idv"),
-                iduser = data.get("iduser"),
+                iduser_id = data.get("iduser"),
                 modo=data.get("modo"),
                 ciudad=data.get("ciudad"),
                 distrito=data.get("distrito"),
@@ -334,7 +334,7 @@ def guardar_valoracion(request):
                 "message": "Valoración guardada correctamente",
                 "data": {
                     "idv" : nueva_valoracion.idv,
-                    "iduser": nueva_valoracion.iduser,
+                    "iduser": nueva_valoracion.iduser_id,
                     "modo": nueva_valoracion.modo,
                     "ciudad": nueva_valoracion.ciudad,
                     "distrito": nueva_valoracion.distrito,
@@ -384,10 +384,20 @@ def modificar_valoracion(request):
                 if campo in data:
                     setattr(valoracion, campo, data[campo])
             
-            # Campos booleanos
-            valoracion.terraza = data.get('terraza') == 'SI'
-            valoracion.balcon = data.get('balcon') == 'SI'
-            valoracion.ascensor = data.get('ascensor') == 'SI'
+            # Campos booleanos — acepta SI/NO, true/false, 1/0, bool
+            def _to_bool(v):
+                if isinstance(v, bool):
+                    return v
+                if v is None:
+                    return False
+                return str(v).strip().lower() in ('si', 'sí', 'true', '1', 'yes')
+
+            if 'terraza' in data:
+                valoracion.terraza = _to_bool(data.get('terraza'))
+            if 'balcon' in data:
+                valoracion.balcon = _to_bool(data.get('balcon'))
+            if 'ascensor' in data:
+                valoracion.ascensor = _to_bool(data.get('ascensor'))
             
             valoracion.save()
             
@@ -553,12 +563,15 @@ def contacto(request):
 
     return render(request, 'contacto.html')
 
+@csrf_exempt
 def get_radar_data(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": "Método no permitido"}, status=405)
     try:
-        data = json.loads(request.body)
-        
+        data = json.loads(request.body or b'{}')
+
         # Validar campos
-        required_fields = ['ciudad', 'distrito', 'barrio', 'tipo_vivienda', 
+        required_fields = ['ciudad', 'distrito', 'barrio', 'tipo_vivienda',
                           'm2', 'num_habitaciones', 'num_banos', 'precio_esperado',
                           'terraza', 'balcon', 'ascensor']
         for field in required_fields:
@@ -693,9 +706,10 @@ def enviar_vivienda_email(request):
         })
     return JsonResponse({"error": "Método no permitido"}, status=405)
 def generar_descripcion_vivienda(m2, hab, banos, ascensor):
-    client = OpenAI(
-        api_key=OPENAI_API_KEY
-    )
+    api_key = getattr(settings, 'OPENAI_API_KEY', '') or os.environ.get('OPENAI_API_KEY', '')
+    if not api_key:
+        raise RuntimeError('OPENAI_API_KEY no configurado en settings/.env')
+    client = OpenAI(api_key=api_key)
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
