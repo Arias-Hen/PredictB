@@ -18,6 +18,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ['127.0.0.1', 'localhost']),
     CORS_ALLOWED_ORIGINS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    USE_SQLITE=(bool, False),
 )
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
@@ -92,17 +93,27 @@ WSGI_APPLICATION = 'interfaz_pr.wsgi.application'
 # ============================================================
 # Database
 # ============================================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT', default='5432'),
-        'OPTIONS': {'sslmode': 'require'},
+USE_SQLITE = env('USE_SQLITE')
+
+if USE_SQLITE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT', default='5432'),
+            'OPTIONS': {'sslmode': 'require'},
+        }
+    }
 
 # Tests: sqlite en memoria — rápido y aislado, no toca Neon.
 if 'test' in sys.argv:
