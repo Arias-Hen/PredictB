@@ -45,10 +45,10 @@ class CalleFilter(SimpleListFilter):
     parameter_name = "calle"
 
     def lookups(self, request, model_admin):
-        barrios = set(model_admin.model.objects.values_list("calle", flat=True))
-        return [(b, b) for b in barrios]
+        calles = set(model_admin.model.objects.values_list("calle", flat=True))
+        return [(c, c) for c in calles]
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(barrio=self.value())
+            return queryset.filter(calle=self.value())
         return queryset

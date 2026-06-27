@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import *
+from .models import Users, Valoracion, Vivienda, ImagenVivienda, Informe
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
