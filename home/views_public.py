@@ -24,7 +24,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 
 from . import locations
 from .models import Users, Valoracion, Vivienda, ImagenVivienda, Informe, PredictionModel
-from .serializers import ValoracionSerializer, ViviendaSerializer, InformeSerializer
+from .serializers import PredictionInputSerializer, ValoracionSerializer, ViviendaSerializer, InformeSerializer
 from .utils import generar_pdf
 
 
@@ -133,7 +133,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Valoracion.objects.filter(iduser=self.request.user.uniqueid).order_by('-fecha_guardado')
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):        
         serializer.save(iduser_id=self.request.user.uniqueid)
 
     @action(detail=False, methods=['post'])
@@ -343,3 +343,17 @@ class ContactoView(APIView):
         except Exception as exc:
             return Response({'error': f'Error enviando email: {exc}'}, status=500)
         return Response({'success': True})
+# ============================================================
+# Prediccion precio
+# ============================================================
+class PrediccionPrecio(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = PredictionInputSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                prediction = PredictionModel.predict(serializer.validated_data)
+                return Response(prediction, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

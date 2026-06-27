@@ -5,7 +5,10 @@ import psycopg2
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-
+import numpy as np
+import joblib
+import pandas as pd
+from functools import lru_cache
 class Task(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -195,7 +198,72 @@ class PredictionModel:
         finally:
             if conn:
                 conn.close()
-                
+
+    @staticmethod
+    def predict(data):
+        ciudad = data.get("ciudad")
+        distrito = data.get("distrito")
+        barrio = data.get("barrio")
+        tipo_vivienda = int(data.get("tipo_vivienda"))
+        m2 = float(data.get("m2"))
+        num_habitaciones = int(data.get("num_habitaciones"))
+        num_banos = int(data.get("num_banos"))
+        planta = int(data.get("planta", 0))
+        terraza = int(data.get("terraza", 0))
+        balcon = int(data.get("balcon", 0))
+        ascensor = int(data.get("ascensor", 0))
+        estado = data.get("estado")
+
+        df_ciudad = load_csv("distritos.csv")
+        df_disbar = load_csv("distrito_barrio.csv")
+
+        ciudad_filtro = df_ciudad[df_ciudad["ciudad"] == ciudad]
+        if ciudad_filtro.empty:
+            raise ValueError(f"Ciudad '{ciudad}' no encontrada en distritos.csv")
+        distrito_filtro = ciudad_filtro[ciudad_filtro["distrito"] == distrito]
+        if distrito_filtro.empty:
+            raise ValueError(f"Distrito '{distrito}' no encontrado para ciudad '{ciudad}'")
+        distrito_val = distrito_filtro["precio_m2_distrito"].values[0]
+
+        barrio_filtro = df_disbar[df_disbar["distrito"] == distrito]
+        barrio_filtro = barrio_filtro[barrio_filtro["barrio"] == barrio]
+        if barrio_filtro.empty:
+            raise ValueError(f"Barrio '{barrio}' no encontrado para distrito '{distrito}'")
+        barrio_val = barrio_filtro["precio_m2_barrio"].values[0]
+
+        if tipo_vivienda not in [2, 5, 6]:
+            X_list = [
+                m2, float(distrito_val), float(barrio_val),
+                tipo_vivienda, num_habitaciones, num_banos,
+                planta, terraza, balcon, ascensor, estado,
+            ]
+            model_path = settings.BASE_DIR / 'modelos' / 'modelo_rf_pisos_joblib.pkl'
+        else:
+            X_list = [
+                m2, float(distrito_val), float(barrio_val),
+                tipo_vivienda, num_habitaciones, num_banos,
+            ]
+            model_path = settings.BASE_DIR / 'modelos' / 'modelo_rf_casas_joblib.pkl'
+
+        if not model_path.exists():
+            raise FileNotFoundError(f"Modelo joblib no encontrado en {model_path}")
+
+        X = np.array(X_list, dtype=np.float64).reshape(1, -1)
+        model = _load_model(str(model_path))
+
+        predicciones = model.predict(X)
+
+        corrector = 0.10
+        predicciones_bottom = predicciones * (1 - 2 * corrector)
+        precio_medio = predicciones * (1 - corrector)
+        predicciones_top = predicciones
+
+        return {
+            "precio_minimo": np.round(predicciones_bottom[0], 2),
+            "precio_esperado": np.round(precio_medio[0], 2),
+            "precio_maximo": np.round(predicciones_top[0], 2),
+        }
+
 class Vivienda(models.Model):
     metros_cuadrados = models.PositiveIntegerField()
     habitaciones = models.PositiveIntegerField()
@@ -225,4 +293,71 @@ class Informe(models.Model):
 
 
     class Meta:
-        db_table = 'informes' 
+        db_table = 'informes'
+
+
+class Ciudad(models.Model):
+    nombre = models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        db_table = 'ciudades'
+        verbose_name_plural = 'ciudades'
+        ordering = ['nombre']
+
+    def __str__(self):
+        return self.nombre
+
+
+class Distrito(models.Model):
+    ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, related_name='distritos')
+    nombre = models.CharField(max_length=255)
+    precio_m2 = models.FloatField(null=True, default=0, blank=True)
+
+    class Meta:
+        db_table = 'distritos'
+        verbose_name_plural = 'distritos'
+        ordering = ['nombre']
+        unique_together = ['nombre', 'ciudad']
+
+    def __str__(self):
+        return f"{self.nombre} ({self.ciudad.nombre})"
+
+
+class Barrio(models.Model):
+    distrito = models.ForeignKey(Distrito, on_delete=models.CASCADE, related_name='barrios')
+    nombre = models.CharField(max_length=255)
+    precio_m2 = models.FloatField(null=True, default=0, blank=True)
+
+    class Meta:
+        db_table = 'barrios'
+        verbose_name_plural = 'barrios'
+        ordering = ['nombre']
+        unique_together = ['nombre', 'distrito']
+
+    def __str__(self):
+        return f"{self.nombre} ({self.distrito.nombre})"
+
+
+class Calle(models.Model):
+    nombre = models.CharField(max_length=255)
+    barrio = models.ForeignKey(Barrio, on_delete=models.CASCADE, related_name='calles')
+    precio_m2 = models.FloatField(null=True, default=0, blank=True)
+
+    class Meta:
+        db_table = 'calles'
+        verbose_name_plural = 'calles'
+        ordering = ['nombre']
+        unique_together = ['nombre', 'barrio']
+
+    def __str__(self):
+        return f"{self.nombre}, {self.barrio.nombre} ({self.barrio.distrito.nombre})"
+
+
+def load_csv(file_name):
+    path = settings.BASE_DIR / 'home' / 'csv' / file_name
+    return pd.read_csv(path, encoding='ISO-8859-1')
+
+
+@lru_cache(maxsize=4)
+def _load_model(model_path):
+    return joblib.load(model_path)

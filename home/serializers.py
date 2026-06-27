@@ -84,3 +84,16 @@ class InformeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         url = obj.archivo_pdf.url
         return request.build_absolute_uri(url) if request else url
+class PredictionInputSerializer(serializers.Serializer):
+    ciudad = serializers.CharField()
+    distrito = serializers.CharField()
+    barrio = serializers.CharField()
+    tipo_vivienda = serializers.CharField()
+    m2 = serializers.FloatField()
+    num_habitaciones = serializers.IntegerField()
+    num_banos = serializers.IntegerField()
+    planta = serializers.IntegerField()
+    terraza = serializers.IntegerField()
+    balcon = serializers.IntegerField()
+    ascensor = serializers.IntegerField()
+    estado = serializers.IntegerField()
