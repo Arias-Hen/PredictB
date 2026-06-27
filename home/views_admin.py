@@ -10,6 +10,8 @@ import io
 import pandas as pd
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Count, Q
 from django.http import HttpResponse
 
@@ -132,6 +134,11 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='set-password')
     def set_password(self, request, pk=None):
+        """Restablece la contraseña de un usuario (p.ej. si la olvidó).
+
+        POST {password}. Valida la fortaleza con AUTH_PASSWORD_VALIDATORS, igual
+        que el registro público.
+        """
         user = self.get_object()
         password = request.data.get('password')
         if not password:
@@ -139,9 +146,20 @@ class UsersViewSet(viewsets.ModelViewSet):
                 {'error': 'password requerido'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # Valida la contraseña contra las reglas del proyecto (longitud, no común,
+        # no similar a los datos del usuario, etc.).
+        try:
+            validate_password(password, user)
+        except DjangoValidationError as exc:
+            return Response(
+                {'password': list(exc.messages)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         user.set_password(password)
         user.save(update_fields=['password'])
-        return Response({'success': True})
+        return Response({'success': True, 'usuario': user.usuario})
 
     @action(detail=True, methods=['post'], url_path='toggle-active')
     def toggle_active(self, request, pk=None):
@@ -156,7 +174,7 @@ class UsersViewSet(viewsets.ModelViewSet):
 # ============================================================
 
 class ValoracionViewSet(viewsets.ModelViewSet):
-    queryset = Valoracion.objects.all().order_by('-fecha_guardado')
+    queryset = Valoracion.objects.select_related('iduser').order_by('-fecha_guardado')
     serializer_class = ValoracionSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -191,6 +209,11 @@ class ValoracionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         df = pd.DataFrame(data)
+        # openpyxl no acepta datetimes con zona horaria ("Excel does not support
+        # timezones in datetimes"): se quita la tz de cualquier columna fecha.
+        for col in df.columns:
+            if pd.api.types.is_datetime64tz_dtype(df[col]):
+                df[col] = df[col].dt.tz_localize(None)
         buf = io.BytesIO()
         with pd.ExcelWriter(buf, engine='openpyxl') as writer:
             df.to_excel(writer, index=False, sheet_name='Valoraciones')

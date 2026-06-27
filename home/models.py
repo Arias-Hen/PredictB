@@ -101,6 +101,8 @@ class Valoracion(models.Model):
     precio_esperado = models.FloatField()
     precio_maximo = models.FloatField()
     precio_esperado_unico= models.FloatField()
+    correccion_manual = models.BooleanField(default=False)
+    precio_corregido = models.FloatField(null=True, blank=True)
     class Meta:
         db_table = 'ventas'
 
@@ -284,12 +286,20 @@ class ImagenVivienda(models.Model):
     
 User = get_user_model()
 class Informe(models.Model):
+    TIPO_CHOICES = (('informe', 'Informe'), ('dossier', 'Dossier'))
+
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     archivo_pdf = models.FileField(upload_to='informes/')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='informe')
+    # Valoración de origen (para mostrar ubicación/precio en la vista Informes).
+    valoracion = models.ForeignKey(
+        'Valoracion', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='informes', db_constraint=False,
+    )
 
     def __str__(self):
-        return f"Informe de {self.usuario} - {self.fecha_creacion.strftime('%Y-%m-%d')}"
+        return f"{self.get_tipo_display()} de {self.usuario} - {self.fecha_creacion.strftime('%Y-%m-%d')}"
 
 
     class Meta:

@@ -106,7 +106,7 @@ class PublicAuthAPITests(TestCase):
     def test_register_ok(self):
         c = APIClient()
         r = c.post('/api/auth/register/', {
-            'usuario': 'pepito', 'email': 'pepito@test.com', 'password': 'secret123',
+            'usuario': 'pepito', 'email': 'pepito@test.com', 'password': 'Tr8!nQpz_w',
         }, format='json')
         self.assertEqual(r.status_code, 201, r.data)
         self.assertTrue(Users.objects.filter(usuario='pepito').exists())
@@ -115,7 +115,7 @@ class PublicAuthAPITests(TestCase):
         Users.objects.create(usuario='dup', email='dup@test.com', nombre='Dup')
         c = APIClient()
         r = c.post('/api/auth/register/', {
-            'usuario': 'dup', 'email': 'dup@test.com', 'password': 'x',
+            'usuario': 'dup', 'email': 'dup@test.com', 'password': 'Tr8!nQpz_w',
         }, format='json')
         self.assertEqual(r.status_code, 409)
 

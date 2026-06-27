@@ -44,20 +44,17 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # ============================================================
 # Apps / middleware
 # ============================================================
+# API-only: sin Django admin/jazzmin ni framework de mensajes. contenttypes
+# se mantiene porque PermissionsMixin (auth) lo requiere; staticfiles por la
+# API navegable de DRF.
 INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_extensions',
     'home',
     'rest_framework',
     'corsheaders',
-    'rangefilter',
-    'django_admin_listfilter_dropdown',
 ]
 
 MIDDLEWARE = [
@@ -67,7 +64,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -83,7 +79,6 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -129,7 +124,12 @@ if 'test' in sys.argv:
 # Auth
 # ============================================================
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        # El modelo usa `usuario` (no `username`), así que hay que nombrar los campos
+        # reales para que la contraseña no pueda parecerse al usuario/nombre/email.
+        'OPTIONS': {'user_attributes': ('usuario', 'nombre', 'email')},
+    },
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
@@ -139,9 +139,6 @@ AUTHENTICATION_BACKENDS = [
     'home.backends.CustomUserBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-LOGIN_URL = 'home/login/'
-LOGIN_REDIRECT_URL = 'home:valoraciones'
 
 # ============================================================
 # i18n
@@ -171,6 +168,10 @@ EMAIL_USE_TLS = env('EMAIL_USE_TLS')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+
+# Base del frontend React: se usa para construir el enlace de recuperación de
+# contraseña que se envía por email.
+FRONTEND_URL = env('FRONTEND_URL', default='http://localhost:5173')
 
 # ============================================================
 # CORS (para frontend React)
@@ -217,57 +218,4 @@ LOGGING = {
             'handlers': ['console'],
         },
     },
-}
-
-# ============================================================
-# Jazzmin
-# ============================================================
-JAZZMIN_SETTINGS = {
-    "site_title": "Dashboard Admin",
-    "site_header": "PredictBuild",
-    "site_brand": "PredictBuild",
-    "site_logo": "images/logo.jpeg",
-    "login_logo": None,
-    "login_logo_dark": None,
-    "site_icon": None,
-    "welcome_sign": "Bienvenido a PredictBuild",
-    "copyright": "Ignite Labs",
-    "search_model": ["auth.User", "auth.Group"],
-    "user_avatar": None,
-    "topmenu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"model": "auth.User"},
-    ],
-    "usermenu_links": [{"model": "auth.user"}],
-    "show_sidebar": True,
-    "navigation_expanded": True,
-    "hide_apps": [],
-    "hide_models": [],
-    "order_with_respect_to": ["auth"],
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-    },
-    "default_icon_parents": "fas fa-chevron-circle-right",
-    "default_icon_children": "fas fa-circle",
-    "related_modal_active": False,
-    "custom_css": "common/styles.css",
-    "custom_js": None,
-    "colors": {
-        "primary": "#0001A0",
-        "secondary": "#2c3e50",
-        "accent": "#f39c12",
-        "link": "#3498db",
-        "navbar": "#1abc9c",
-        "navbar_text": "#ffffff",
-        "sidebar_bg": "#0001A0",
-        "sidebar_link": "#ffffff",
-        "sidebar_link_hover": "#1abc9c",
-        "button": "#1abc9c",
-    },
-    "use_google_fonts_cdn": True,
-    "show_ui_builder": False,
-    "changeform_format": "horizontal_tabs",
-    "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
 }
