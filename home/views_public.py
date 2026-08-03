@@ -7,6 +7,7 @@ el front debe usar `credentials: 'include'` y mandar `X-CSRFToken`.
 Rutas montadas en /api/  (ver home/urls_public.py).
 """
 import io
+import logging
 import os
 
 import pandas as pd
@@ -37,6 +38,8 @@ from . import locations
 from .models import Users, Valoracion, Vivienda, ImagenVivienda, Informe, PredictionModel
 from .serializers import PredictionInputSerializer, ValoracionSerializer, ViviendaSerializer, InformeSerializer
 from .utils import generar_pdf
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================
@@ -332,6 +335,72 @@ class ValoracionViewSet(viewsets.ModelViewSet):
         resp['Content-Disposition'] = 'attachment; filename="valoraciones_seleccionadas.xlsx"'
         return resp
 
+    @action(detail=False, methods=['post'], url_path='enviar-excel-email')
+    def enviar_excel_email(self, request):
+        """POST {ids: [...], email: "..."} -> genera Excel y lo envía por email.
+
+        Solo envía valoraciones del propio usuario (get_queryset ya filtra).
+        Si `ids` viene vacío envía todas las del usuario.
+        """
+        ids = request.data.get('ids') or []
+        email = (request.data.get('email') or '').strip()
+
+        if not email:
+            return Response({'error': 'Email de destino requerido'}, status=400)
+
+        qs = self.get_queryset()
+        if ids:
+            qs = qs.filter(idv__in=ids)
+
+        campos = [
+            'fecha_guardado', 'modo', 'ciudad', 'distrito', 'barrio', 'calle',
+            'planta', 'tipo_vivienda', 'estado_inmueble', 'metros_cuadrados',
+            'num_habitaciones', 'num_banos', 'terraza', 'balcon', 'ascensor',
+            'precio_minimo', 'precio_esperado', 'precio_maximo', 'precio_esperado_unico',
+        ]
+        data = list(qs.values(*campos))
+        if not data:
+            return Response(
+                {'error': 'No hay valoraciones seleccionadas para enviar'},
+                status=400,
+            )
+
+        df = pd.DataFrame(data, columns=campos)
+        if 'fecha_guardado' in df:
+            df['fecha_guardado'] = pd.to_datetime(df['fecha_guardado']).dt.tz_localize(None)
+        for col in ('terraza', 'balcon', 'ascensor'):
+            df[col] = df[col].map({True: 'SI', False: 'NO'}).fillna(df[col])
+
+        buf = io.BytesIO()
+        with pd.ExcelWriter(buf, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Valoraciones')
+
+        msg = EmailMessage(
+            subject='Valoraciones - PredictBuild',
+            body=(
+                f'Hola {request.user.nombre or request.user.usuario},\n\n'
+                f'Adjuntamos el archivo Excel con las valoraciones seleccionadas.\n\n'
+                f'Un saludo,\nEquipo PredictBuild'
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[email],
+        )
+        msg.attach(
+            'valoraciones_seleccionadas.xlsx',
+            buf.getvalue(),
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        try:
+            msg.send()
+        except Exception:
+            logger.exception('Fallo al enviar email por SMTP')
+            return Response(
+                {'error': 'No se pudo enviar el email. Inténtalo de nuevo más tarde.'},
+                status=500,
+            )
+
+        return Response({'success': True, 'enviado_a': email})
+
 
 # ============================================================
 # Locations (ciudades/distritos/barrios/calles) desde CSV cacheado
@@ -491,8 +560,12 @@ class ViviendaViewSet(viewsets.ModelViewSet):
         msg.attach('informe_vivienda.pdf', pdf_bytes, 'application/pdf')
         try:
             msg.send()
-        except Exception as exc:
-            return Response({'error': f'Error enviando email: {exc}'}, status=500)
+        except Exception:
+            logger.exception('Fallo al enviar email por SMTP')
+            return Response(
+                {'error': 'No se pudo enviar el email. Inténtalo de nuevo más tarde.'},
+                status=500,
+            )
         return Response({'success': True, 'enviado_a': request.user.email})
 
 
@@ -627,8 +700,12 @@ class InformeViewSet(viewsets.ReadOnlyModelViewSet):
         msg.attach(os.path.basename(informe.archivo_pdf.name), pdf_bytes, 'application/pdf')
         try:
             msg.send()
-        except Exception as exc:
-            return Response({'error': f'Error enviando email: {exc}'}, status=500)
+        except Exception:
+            logger.exception('Fallo al enviar email por SMTP')
+            return Response(
+                {'error': 'No se pudo enviar el email. Inténtalo de nuevo más tarde.'},
+                status=500,
+            )
         return Response({'success': True, 'enviado_a': destinatario})
 
 
@@ -665,8 +742,12 @@ class ContactoView(APIView):
                 reply_to=[d.get('correo_electronico')],
             )
             msg.send()
-        except Exception as exc:
-            return Response({'error': f'Error enviando email: {exc}'}, status=500)
+        except Exception:
+            logger.exception('Fallo al enviar email por SMTP')
+            return Response(
+                {'error': 'No se pudo enviar el email. Inténtalo de nuevo más tarde.'},
+                status=500,
+            )
         return Response({'success': True})
 # ============================================================
 # Prediccion precio
